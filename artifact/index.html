@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Lumenboard — Weekly Risk Digest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f7f7f8;
+    --panel: #ffffff;
+    --border: #e2e2e6;
+    --text: #1c1c1f;
+    --muted: #6b6b74;
+    --accent: #4b5563;
+    --urgent: #d64545;
+    --urgent-bg: #fdecec;
+    --watch: #b8860b;
+    --watch-bg: #fbf3df;
+    --healthy: #2e8b57;
+    --healthy-bg: #e9f6ee;
+    --sparkline: #4b5563;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16161a;
+      --panel: #1f2023;
+      --border: #302f34;
+      --text: #ecebee;
+      --muted: #9a99a2;
+      --accent: #c7c6cc;
+      --urgent: #ff6b6b;
+      --urgent-bg: #3a1f1f;
+      --watch: #e0b13a;
+      --watch-bg: #3a3320;
+      --healthy: #5fd08c;
+      --healthy-bg: #1f3327;
+      --sparkline: #c7c6cc;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header {
+    padding: 20px 24px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 { margin: 0 0 4px; font-size: 1.4rem; }
+  header p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .toolbar label { font-size: 0.78rem; color: var(--muted); display: flex; flex-direction: column; gap: 3px; }
+  .toolbar input, .toolbar select {
+    font-size: 0.85rem;
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+  }
+  .toolbar button {
+    font-size: 0.85rem;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--accent);
+    color: var(--panel);
+    cursor: pointer;
+  }
+  .toolbar button.secondary { background: var(--bg); color: var(--text); }
+  .status-line { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
+
+  main { padding: 20px 24px 60px; max-width: 1000px; margin: 0 auto; }
+  .bucket { margin-bottom: 28px; }
+  .bucket-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px; cursor: pointer;
+  }
+  .bucket-header h2 { font-size: 1rem; margin: 0; }
+  .count-badge {
+    font-size: 0.75rem; font-weight: 600; border-radius: 999px; padding: 2px 10px;
+  }
+  .bucket-urgent .count-badge { background: var(--urgent-bg); color: var(--urgent); }
+  .bucket-watch .count-badge { background: var(--watch-bg); color: var(--watch); }
+  .bucket-healthy .count-badge { background: var(--healthy-bg); color: var(--healthy); }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left-width: 4px;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .bucket-urgent .card { border-left-color: var(--urgent); }
+  .bucket-watch .card { border-left-color: var(--watch); }
+  .bucket-healthy .card { border-left-color: var(--healthy); }
+
+  .card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; cursor: pointer; }
+  .card-top .name { font-weight: 600; }
+  .card-meta { color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+  .card-reason { margin-top: 4px; font-size: 0.85rem; color: var(--text); }
+  .card-detail { margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 10px; display: none; }
+  .card.expanded .card-detail { display: block; }
+
+  .spark-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .spark-row svg { flex-shrink: 0; }
+  .spark-label { font-size: 0.75rem; color: var(--muted); }
+
+  .event-mix { display: flex; flex-wrap: wrap; gap: 6px; }
+  .event-badge {
+    font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .event-badge.positive { color: var(--healthy); border-color: var(--healthy); }
+
+  .empty-state { color: var(--muted); font-size: 0.85rem; padding: 8px 0; }
+  .error-banner {
+    background: var(--urgent-bg); color: var(--urgent); padding: 10px 14px; border-radius: 8px;
+    margin: 12px 24px; font-size: 0.85rem;
+  }
+  .flag {
+    font-size: 0.7rem; color: var(--watch); border: 1px dashed var(--watch); border-radius: 6px; padding: 1px 6px; margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Lumenboard — Weekly Risk Digest</h1>
+  <p>Accounts ranked by churn exposure — health, usage trend, and renewal proximity, cross-referenced.</p>
+</header>
+
+<div class="toolbar">
+  <label>API base
+    <input id="cfg-base" type="text" size="18" placeholder="/api" />
+  </label>
+  <label>API key
+    <input id="cfg-key" type="password" size="14" placeholder="team key" />
+  </label>
+  <label>Plan
+    <select id="filter-plan">
+      <option value="">All plans</option>
+      <option value="starter">Starter</option>
+      <option value="pro">Pro</option>
+      <option value="enterprise">Enterprise</option>
+    </select>
+  </label>
+  <label>Renewal within
+    <select id="filter-window">
+      <option value="">Any time</option>
+      <option value="30">30 days</option>
+      <option value="60">60 days</option>
+      <option value="90">90 days</option>
+    </select>
+  </label>
+  <label>Sort by
+    <select id="sort-by">
+      <option value="risk">Risk (high → low)</option>
+      <option value="mrr">MRR (high → low)</option>
+      <option value="renewal">Renewal (soonest)</option>
+      <option value="name">Name (A → Z)</option>
+    </select>
+  </label>
+  <button id="btn-reload">Reload</button>
+  <span class="status-line" id="status-line">not loaded yet</span>
+</div>
+
+<div id="error-slot"></div>
+<main id="main">
+  <div class="empty-state">Loading accounts…</div>
+</main>
+
+<script type="module">
+import { listAtRiskAccounts } from '../mcp-server/src/tools/list_at_risk_accounts.mjs';
+import { listRecentEvents } from '../mcp-server/src/tools/list_recent_events.mjs';
+import { getAccountUsage } from '../mcp-server/src/tools/get_account_usage.mjs';
+
+const STORAGE_KEY = 'lumenboard.artifact.settings.v1';
+const POSITIVE_EVENT_TYPES = new Set(['seat_added', 'invite_sent', 'integration_connected']);
+
+const baseInput = document.getElementById('cfg-base');
+const keyInput = document.getElementById('cfg-key');
+const planFilter = document.getElementById('filter-plan');
+const windowFilter = document.getElementById('filter-window');
+const sortBy = document.getElementById('sort-by');
+const reloadBtn = document.getElementById('btn-reload');
+const statusLine = document.getElementById('status-line');
+const errorSlot = document.getElementById('error-slot');
+const mainEl = document.getElementById('main');
+
+function loadSettings() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (_) { saved = {}; }
+  baseInput.value = saved.base || '/api';
+  keyInput.value = saved.key || '';
+  planFilter.value = saved.plan || '';
+  windowFilter.value = saved.window || '';
+  sortBy.value = saved.sort || 'risk';
+}
+
+function saveSettings() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    base: baseInput.value,
+    key: keyInput.value,
+    plan: planFilter.value,
+    window: windowFilter.value,
+    sort: sortBy.value,
+  }));
+}
+
+function clientOpts() {
+  return { baseUrl: baseInput.value || '/api', apiKey: keyInput.value };
+}
+
+function sparklineSvg(series) {
+  if (!series || series.length === 0) {
+    return '<span class="spark-label">no usage history</span>';
+  }
+  const w = 120, h = 28, pad = 2;
+  const values = series.map((p) => p.active_users);
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const stepX = (w - pad * 2) / Math.max(1, values.length - 1);
+  const points = values.map((v, i) => {
+    const x = pad + i * stepX;
+    const y = h - pad - ((v - min) / range) * (h - pad * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <polyline fill="none" stroke="var(--sparkline)" stroke-width="1.6" points="${points}" />
+  </svg>`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function passesFilters(account) {
+  if (planFilter.value && account.plan !== planFilter.value) return false;
+  if (windowFilter.value) {
+    const windowDays = Number(windowFilter.value);
+    if (!(account.days_to_renewal >= 0 && account.days_to_renewal <= windowDays)) return false;
+  }
+  return true;
+}
+
+function sortAccounts(list) {
+  const sorted = list.slice();
+  switch (sortBy.value) {
+    case 'mrr': sorted.sort((a, b) => b.mrr - a.mrr); break;
+    case 'renewal': sorted.sort((a, b) => a.days_to_renewal - b.days_to_renewal); break;
+    case 'name': sorted.sort((a, b) => a.name.localeCompare(b.name)); break;
+    default: sorted.sort((a, b) => b.combined_risk - a.combined_risk);
+  }
+  return sorted;
+}
+
+async function renderEventMix(account, container) {
+  container.innerHTML = '<span class="spark-label">loading events…</span>';
+  const res = await listRecentEvents({ account_id: account.id, ...clientOpts() });
+  if (!res.ok) {
+    container.innerHTML = `<span class="spark-label">${escapeHtml(res.message)}</span>`;
+    return;
+  }
+  const counts = res.data.event_counts;
+  const types = Object.keys(counts);
+  if (types.length === 0) {
+    container.innerHTML = '<span class="spark-label">no recent events</span>';
+    return;
+  }
+  container.innerHTML = types
+    .sort((a, b) => counts[b] - counts[a])
+    .map((t) => `<span class="event-badge ${POSITIVE_EVENT_TYPES.has(t) ? 'positive' : ''}">${escapeHtml(t)} × ${counts[t]}</span>`)
+    .join('');
+}
+
+function cardHtml(account) {
+  const renewalLabel = account.days_to_renewal < 0
+    ? `renewed ${Math.abs(account.days_to_renewal)}d ago`
+    : `renews in ${account.days_to_renewal}d`;
+  const flag = account.usage_insufficient_signal ? '<span class="flag">insufficient usage history</span>' : '';
+  return `
+    <div class="card" data-account-id="${escapeHtml(account.id)}">
+      <div class="card-top">
+        <span class="name">${escapeHtml(account.name)} <span class="card-meta">${escapeHtml(account.plan)}</span></span>
+        <span class="card-meta">$${account.mrr.toLocaleString()} MRR · ${renewalLabel}</span>
+      </div>
+      <div class="card-reason">${escapeHtml(account.reason)}${flag}</div>
+      <div class="card-detail">
+        <div class="spark-row">
+          <div class="spark-svg"></div>
+          <span class="spark-label">weekly active users</span>
+        </div>
+        <div class="event-mix"><span class="spark-label">loading events…</span></div>
+      </div>
+    </div>`;
+}
+
+function attachCardHandlers(container, accountsById) {
+  container.querySelectorAll('.card').forEach((card) => {
+    const top = card.querySelector('.card-top');
+    top.addEventListener('click', async () => {
+      const wasExpanded = card.classList.contains('expanded');
+      card.classList.toggle('expanded');
+      if (wasExpanded) return;
+      const account = accountsById.get(card.dataset.accountId);
+      const sparkSlot = card.querySelector('.spark-svg');
+      sparkSlot.innerHTML = sparklineSvg(account.__series);
+      const eventSlot = card.querySelector('.event-mix');
+      renderEventMix(account, eventSlot);
+    });
+  });
+}
+
+function renderBuckets(accounts) {
+  const accountsById = new Map(accounts.map((a) => [a.id, a]));
+  const buckets = [
+    { key: 'urgent', label: 'Urgent' },
+    { key: 'watch', label: 'Watch' },
+    { key: 'healthy', label: 'Healthy' },
+  ];
+  mainEl.innerHTML = buckets.map(({ key, label }) => {
+    const list = sortAccounts(accounts.filter((a) => a.bucket === key && passesFilters(a)));
+    const body = list.length
+      ? list.map(cardHtml).join('')
+      : '<div class="empty-state">No accounts in this bucket right now.</div>';
+    return `
+      <section class="bucket bucket-${key}">
+        <div class="bucket-header">
+          <h2>${label}</h2>
+          <span class="count-badge">${list.length}</span>
+        </div>
+        ${body}
+      </section>`;
+  }).join('');
+  buckets.forEach(({ key }) => {
+    const section = mainEl.querySelector(`.bucket-${key}`);
+    attachCardHandlers(section, accountsById);
+  });
+}
+
+let lastLoadedAt = null;
+
+async function loadAndRender() {
+  statusLine.textContent = 'loading…';
+  errorSlot.innerHTML = '';
+  const res = await listAtRiskAccounts(clientOpts());
+  if (!res.ok) {
+    errorSlot.innerHTML = `<div class="error-banner">${escapeHtml(res.message)}</div>`;
+    statusLine.textContent = 'load failed';
+    mainEl.innerHTML = '<div class="empty-state">Could not load accounts. Check API base/key above and reload.</div>';
+    return;
+  }
+
+  // get_account_usage isn't re-fetched here — list_at_risk_accounts already
+  // walked /accounts/{id}/usage to compute risk; the sparkline reuses that
+  // series so opening a card is instant.
+  const withSeries = await Promise.all(res.data.map(async (account) => {
+    const usageRes = await getAccountUsage({ account_id: account.id, ...clientOpts() });
+    return { ...account, __series: usageRes.ok ? usageRes.data.series : [] };
+  }));
+
+  renderBuckets(withSeries);
+  lastLoadedAt = new Date();
+  statusLine.textContent = `loaded ${withSeries.length} accounts at ${lastLoadedAt.toLocaleTimeString()}`;
+}
+
+[planFilter, windowFilter, sortBy].forEach((el) => el.addEventListener('change', () => {
+  saveSettings();
+  loadAndRender();
+}));
+[baseInput, keyInput].forEach((el) => el.addEventListener('change', saveSettings));
+reloadBtn.addEventListener('click', () => { saveSettings(); loadAndRender(); });
+
+loadSettings();
+loadAndRender();
+</script>
+</body>
+</html>
