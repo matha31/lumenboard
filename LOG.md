@@ -78,6 +78,18 @@ stall rule. Requesting `LFD_HOLDOUT_DATA=<path> bash harness/score.sh
 ≥0.85, urgent recall ≥0.85, tool_differentiation_pass=true) against
 accounts this session has never seen.
 
+## Post-holdout: artifact fix + proposal-fidelity hardening (operator, not an optimizer cycle) — 2026-07-22
+End-to-end verification (launched the artifact in a browser, drove all four tools live) surfaced gaps the harness structurally can't see, since it only scores `computeRisk` + tool-differentiation and never renders the artifact.
+
+- **Artifact was dead on arrival (fixed).** `lumenboardClient` used `new URL(path, base)`, which threw on the artifact's relative `/api` base and dropped the path prefix on an absolute one. No API base made it load. Now joins base+path as a prefix, resolving relative bases against the page origin. +4 regression tests.
+- **Proposal §03 guardrails that were dropped in the spec→build distillation, now implemented:**
+  - *Output validation:* new `mcp-server/src/schemas.mjs` (dependency-free, browser-safe) validates `/accounts`, `/accounts/{id}/usage`, `/users`, `/events` response shapes before use; wired into all four tools; a drifted shape is refused, not mis-scored.
+  - *Credential scoping:* the artifact no longer holds an API key — the key field is gone; it calls its same-origin backend (`dev-proxy`/MCP server) which injects the key server-side from `UPSTREAM_API_KEY`. The credential never enters client code or the model context.
+  - *`GET /health` preflight:* `checkHealth()` added to the client; the artifact runs it before firing tools (clear banner on failure, verified), and the MCP server logs a health confirmation/warning at startup.
+  - *`account_id` format check:* validated locally (`acc_`-prefixed) before any network call, permissive enough that a well-formed-but-unknown id still 404s.
+  - *Tool input naming:* `risk_threshold` is now the canonical input (proposal name); `min_risk` kept as a back-compat alias.
+- Result: `npm test` **42/42** (was 28); `harness/lint.js` ok; dev **1.0**, probe **1.0** unchanged (scoring path untouched); artifact verified rendering all 42 accounts with zero client-side key. No harness or checksummed files touched.
+
 ## Final report
 - Best holdout score:
 - What generalized:

@@ -1,7 +1,7 @@
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { callLumenboard } from '../mcp-server/src/lumenboardClient.mjs';
+import { callLumenboard, checkHealth } from '../mcp-server/src/lumenboardClient.mjs';
 import { startMockServer } from './helpers/mock-server.mjs';
 
 describe('callLumenboard', () => {
@@ -92,5 +92,31 @@ describe('callLumenboard — base that carries a path prefix (artifact /api shap
   test('a query string on the path survives the prefix join', async () => {
     await callLumenboard('/accounts?_force_error=429', { baseUrl: `http://localhost:${port}/api`, apiKey: 'k', retryDelayMs: 5 });
     assert.equal(recordedPaths.at(-1), '/api/accounts?_force_error=429');
+  });
+});
+
+// Proposal §03: GET /health preflight before tools go live.
+describe('checkHealth', () => {
+  let server;
+  before(async () => { server = await startMockServer({ port: 3193, teamKey: 'health-test-key' }); });
+  after(async () => { await server.stop(); });
+
+  test('ok:true when base is reachable and key is accepted', async () => {
+    const res = await checkHealth({ baseUrl: server.baseUrl, apiKey: server.apiKey });
+    assert.equal(res.ok, true);
+    assert.equal(res.status, 200);
+  });
+
+  test('ok:false with a re-auth message on a bad key', async () => {
+    const res = await checkHealth({ baseUrl: server.baseUrl, apiKey: 'wrong-key' });
+    assert.equal(res.ok, false);
+    assert.equal(res.status, 401);
+    assert.match(res.message, /re-authenticate|key/i);
+  });
+
+  test('ok:false (not a throw) when the base is unreachable', async () => {
+    const res = await checkHealth({ baseUrl: 'http://localhost:59999', apiKey: 'k' });
+    assert.equal(res.ok, false);
+    assert.match(res.message, /cannot reach/i);
   });
 });

@@ -19,6 +19,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const PORT = Number(process.env.DEV_PROXY_PORT || 8090);
 const UPSTREAM = process.env.UPSTREAM_API_BASE || 'http://localhost:3001';
+// The team API key lives here (server-side) only — set UPSTREAM_API_KEY (or
+// LUMENBOARD_API_KEY) when starting the proxy. It is injected onto every
+// upstream call and is NEVER sent to or read from the browser, so it stays out
+// of the artifact's client code and the model's context (proposal §03).
+const UPSTREAM_KEY = process.env.UPSTREAM_API_KEY || process.env.LUMENBOARD_API_KEY || '';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -30,9 +35,10 @@ const MIME = {
 
 async function proxyApi(req, res, subPath) {
   const upstreamUrl = new URL(subPath, UPSTREAM);
+  // Inject the key server-side; deliberately ignore any x-api-key the browser
+  // sends so a client-supplied credential can never override the scoped one.
   const headers = {};
-  if (req.headers['x-api-key']) headers['x-api-key'] = req.headers['x-api-key'];
-  if (req.headers['authorization']) headers['authorization'] = req.headers['authorization'];
+  if (UPSTREAM_KEY) headers['x-api-key'] = UPSTREAM_KEY;
   try {
     const upstreamRes = await fetch(upstreamUrl, { headers });
     const body = await upstreamRes.text();
@@ -75,5 +81,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Lumenboard artifact dev server: http://localhost:${PORT}/artifact/index.html`);
-  console.log(`Proxying /api/* -> ${UPSTREAM}`);
+  console.log(`Proxying /api/* -> ${UPSTREAM} (server-side key injection: ${UPSTREAM_KEY ? 'on' : 'OFF — set UPSTREAM_API_KEY'})`);
 });

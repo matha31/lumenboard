@@ -43,10 +43,24 @@ describe('tool layer — behavior table (docs/Scenario-3-Lumenboard-Guide.md)', 
     assert.match(res.message, /weeks/i);
   });
 
-  test('400 bad parameter -> list_at_risk_accounts rejects an out-of-range min_risk locally', async () => {
-    const res = await listAtRiskAccounts({ min_risk: 5, ...opts() });
+  test('400 bad parameter -> list_at_risk_accounts rejects an out-of-range risk_threshold locally', async () => {
+    const res = await listAtRiskAccounts({ risk_threshold: 5, ...opts() });
     assert.equal(res.ok, false);
-    assert.match(res.message, /min_risk/i);
+    assert.match(res.message, /risk_threshold/i);
+  });
+
+  test('min_risk is accepted as a back-compat alias for risk_threshold', async () => {
+    const bad = await listAtRiskAccounts({ min_risk: 5, ...opts() });
+    assert.equal(bad.ok, false, 'alias should be validated the same way');
+    const ok = await listAtRiskAccounts({ min_risk: 0.6, ...opts() });
+    assert.equal(ok.ok, true);
+    assert.ok(ok.data.every((a) => a.combined_risk >= 0.6), 'alias should filter identically');
+  });
+
+  test('account_id format is validated locally before the network call', async () => {
+    const res = await getAccountUsage({ account_id: 'not a valid id', ...opts() });
+    assert.equal(res.ok, false);
+    assert.match(res.message, /valid account id format/i);
   });
 
   test('empty-but-valid: far-future `since` on events is an empty list, not an error', async () => {

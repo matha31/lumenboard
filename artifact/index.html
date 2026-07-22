@@ -146,9 +146,6 @@
   <label>API base
     <input id="cfg-base" type="text" size="18" placeholder="/api" />
   </label>
-  <label>API key
-    <input id="cfg-key" type="password" size="14" placeholder="team key" />
-  </label>
   <label>Plan
     <select id="filter-plan">
       <option value="">All plans</option>
@@ -186,12 +183,12 @@
 import { listAtRiskAccounts } from '../mcp-server/src/tools/list_at_risk_accounts.mjs';
 import { listRecentEvents } from '../mcp-server/src/tools/list_recent_events.mjs';
 import { getAccountUsage } from '../mcp-server/src/tools/get_account_usage.mjs';
+import { checkHealth } from '../mcp-server/src/lumenboardClient.mjs';
 
 const STORAGE_KEY = 'lumenboard.artifact.settings.v1';
 const POSITIVE_EVENT_TYPES = new Set(['seat_added', 'invite_sent', 'integration_connected']);
 
 const baseInput = document.getElementById('cfg-base');
-const keyInput = document.getElementById('cfg-key');
 const planFilter = document.getElementById('filter-plan');
 const windowFilter = document.getElementById('filter-window');
 const sortBy = document.getElementById('sort-by');
@@ -204,7 +201,6 @@ function loadSettings() {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (_) { saved = {}; }
   baseInput.value = saved.base || '/api';
-  keyInput.value = saved.key || '';
   planFilter.value = saved.plan || '';
   windowFilter.value = saved.window || '';
   sortBy.value = saved.sort || 'risk';
@@ -213,15 +209,17 @@ function loadSettings() {
 function saveSettings() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
     base: baseInput.value,
-    key: keyInput.value,
     plan: planFilter.value,
     window: windowFilter.value,
     sort: sortBy.value,
   }));
 }
 
+// No apiKey here on purpose: the artifact talks to its same-origin backend
+// (`/api`, the dev-proxy / MCP server), which injects the team key server-side.
+// The credential never enters client code or the model's context (proposal §03).
 function clientOpts() {
-  return { baseUrl: baseInput.value || '/api', apiKey: keyInput.value };
+  return { baseUrl: baseInput.value || '/api' };
 }
 
 function sparklineSvg(series) {
@@ -354,8 +352,19 @@ function renderBuckets(accounts) {
 let lastLoadedAt = null;
 
 async function loadAndRender() {
-  statusLine.textContent = 'loading…';
+  statusLine.textContent = 'checking connection…';
   errorSlot.innerHTML = '';
+  // Confirm the backend is reachable and authenticated before firing tools
+  // (proposal §03). The key is injected server-side, so this also verifies the
+  // proxy/MCP server actually holds a working credential.
+  const health = await checkHealth(clientOpts());
+  if (!health.ok) {
+    errorSlot.innerHTML = `<div class="error-banner">${escapeHtml(health.message)}</div>`;
+    statusLine.textContent = 'connection failed';
+    mainEl.innerHTML = '<div class="empty-state">Backend health check failed. Confirm the API base and that the server-side key is configured, then reload.</div>';
+    return;
+  }
+  statusLine.textContent = 'loading…';
   const res = await listAtRiskAccounts(clientOpts());
   if (!res.ok) {
     errorSlot.innerHTML = `<div class="error-banner">${escapeHtml(res.message)}</div>`;
@@ -381,7 +390,7 @@ async function loadAndRender() {
   saveSettings();
   loadAndRender();
 }));
-[baseInput, keyInput].forEach((el) => el.addEventListener('change', saveSettings));
+baseInput.addEventListener('change', saveSettings);
 reloadBtn.addEventListener('click', () => { saveSettings(); loadAndRender(); });
 
 loadSettings();

@@ -3,6 +3,7 @@
 // summary so callers don't have to tally a raw stream themselves.
 import { callLumenboard } from '../lumenboardClient.mjs';
 import { mapApiError } from '../errors.mjs';
+import { isValidAccountId, validateEventsResponse } from '../schemas.mjs';
 
 export const description =
   'Returns recent product events (login, dashboard_view, report_export, invite_sent, seat_added, integration_connected), optionally filtered to one account and/or a since date, walking all result pages internally, plus a per-type count summary. Use to see what an account has actually been doing — including positive signals like seat_added — not just its risk score.';
@@ -10,6 +11,9 @@ export const description =
 export async function listRecentEvents(input = {}) {
   const { account_id, since, limit } = input;
 
+  if (account_id !== undefined && !isValidAccountId(account_id)) {
+    return { ok: false, message: `account_id "${account_id}" is not a valid account id format (expected an acc_-prefixed id).` };
+  }
   if (since !== undefined && Number.isNaN(Date.parse(since))) {
     return { ok: false, message: 'since, if provided, must be a valid ISO 8601 date-time.' };
   }
@@ -27,6 +31,8 @@ export async function listRecentEvents(input = {}) {
     params.set('limit', '100');
     const res = await callLumenboard(`/events?${params.toString()}`, input);
     if (!res.ok) return mapApiError(res);
+    const shape = validateEventsResponse(res.data);
+    if (!shape.ok) return shape;
     for (const ev of res.data.data) {
       if (seenIds.has(ev.id)) continue;
       seenIds.add(ev.id);

@@ -3,6 +3,7 @@
 // not for triage.
 import { callLumenboard } from '../lumenboardClient.mjs';
 import { mapApiError } from '../errors.mjs';
+import { validateAccountsResponse, validateUsersPage } from '../schemas.mjs';
 
 export const description =
   'Plain directory of every account (name, plan, seats, MRR, health score, and renewal date) for browsing or looking up one specific customer by name. Returns everything unfiltered and unsorted; nothing here is prioritized.';
@@ -14,6 +15,8 @@ async function fetchAllUsers(opts) {
   for (;;) {
     const res = await callLumenboard(`/users?page=${page}&pageSize=${pageSize}`, opts);
     if (!res.ok) return { ok: false, error: res };
+    const shape = validateUsersPage(res.data);
+    if (!shape.ok) return { ok: false, shapeError: shape };
     users.push(...res.data.data);
     if (!res.data.has_next) break;
     page += 1;
@@ -24,8 +27,11 @@ async function fetchAllUsers(opts) {
 export async function listAccounts(input = {}) {
   const accRes = await callLumenboard('/accounts', input);
   if (!accRes.ok) return mapApiError(accRes);
+  const accShape = validateAccountsResponse(accRes.data);
+  if (!accShape.ok) return accShape;
 
   const usersRes = await fetchAllUsers(input);
+  if (usersRes.shapeError) return usersRes.shapeError;
   const userCounts = new Map();
   if (usersRes.ok) {
     for (const u of usersRes.users) {

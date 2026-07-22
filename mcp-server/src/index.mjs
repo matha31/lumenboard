@@ -6,6 +6,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
+import { checkHealth } from './lumenboardClient.mjs';
 
 import { listAtRiskAccounts, description as listAtRiskAccountsDescription } from './tools/list_at_risk_accounts.mjs';
 import { getAccountUsage, description as getAccountUsageDescription } from './tools/get_account_usage.mjs';
@@ -26,7 +27,8 @@ server.registerTool(
   {
     description: listAtRiskAccountsDescription,
     inputSchema: {
-      min_risk: z.number().min(0).max(1).optional().describe('Only return accounts with combined_risk at or above this threshold (0-1).'),
+      risk_threshold: z.number().min(0).max(1).optional().describe('Only return accounts with combined_risk at or above this threshold (0-1).'),
+      min_risk: z.number().min(0).max(1).optional().describe('Deprecated alias for risk_threshold.'),
       bucket: z.enum(['urgent', 'watch', 'healthy']).optional().describe('Only return accounts in this risk bucket.'),
       limit: z.number().int().min(1).optional().describe('Maximum number of accounts to return, highest risk first.'),
     },
@@ -67,6 +69,16 @@ server.registerTool(
   },
   async (input) => asToolResult(await listRecentEvents(input)),
 );
+
+// Proposal §03: confirm the base URL + key via GET /health before tools go live.
+// Logged to stderr (stdout is the MCP protocol channel); a failure is surfaced
+// loudly but non-fatally so the server still recovers once the API is reachable.
+const health = await checkHealth();
+if (health.ok) {
+  console.error('[lumenboard] /health ok — API reachable and key accepted; tools live.');
+} else {
+  console.error(`[lumenboard] WARNING: /health preflight failed (${health.message}). Tools are registered but calls will fail until this is resolved.`);
+}
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

@@ -29,9 +29,13 @@ function buildRequestUrl(path, base) {
 
 async function doRequest(path, base, key) {
   const url = buildRequestUrl(path, base);
-  const res = await fetch(url, {
-    headers: { 'x-api-key': key },
-  });
+  // Omit x-api-key entirely when the caller holds no key — e.g. the browser
+  // artifact, whose same-origin backend/proxy injects the key server-side so it
+  // never lives in client code (proposal §03, "credential scoping"). Sending a
+  // literal "undefined"/"" header would just earn a spurious 401.
+  const headers = {};
+  if (key) headers['x-api-key'] = key;
+  const res = await fetch(url, { headers });
   let body = null;
   try {
     body = await res.json();
@@ -75,4 +79,21 @@ export async function callLumenboard(path, opts = {}) {
 
   const error = (result.body && result.body.error) || { code: 'unknown_error', message: `Request failed with status ${result.status}.` };
   return { ok: false, status: result.status, error };
+}
+
+// Proposal §03: "confirmed via GET /health before any tool goes live." A cheap
+// liveness+auth preflight — 200 means the base URL is reachable and the key (if
+// any) is accepted. Returns { ok: true } | { ok: false, status, message }.
+export async function checkHealth(opts = {}) {
+  const base = opts.baseUrl || envDefault('LUMENBOARD_API_BASE');
+  const key = opts.apiKey || envDefault('LUMENBOARD_API_KEY');
+  let result;
+  try {
+    result = await doRequest('/health', base, key);
+  } catch (e) {
+    return { ok: false, status: 0, message: `Cannot reach Lumenboard at ${base} — ${e.message}.` };
+  }
+  if (result.status >= 200 && result.status < 300) return { ok: true, status: result.status };
+  if (result.status === 401) return { ok: false, status: 401, message: 'Lumenboard rejected the API key on /health — re-authenticate before using the tools.' };
+  return { ok: false, status: result.status, message: `Lumenboard /health returned ${result.status}.` };
 }
