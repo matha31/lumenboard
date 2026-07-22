@@ -1,0 +1,17 @@
+# Integrity-critical, checksum-verified files (see harness/.checksums.json).
+# Force LF in the working tree on every platform so working-copy bytes always
+# match the recorded sha256. Without this, core.autocrlf=true rewrites these on
+# checkout/clone and silently trips lint.js -> "VOID: constraint violation".
+harness/score.js               text eol=lf
+harness/lint.js                text eol=lf
+harness/probe.js               text eol=lf
+harness/status.js              text eol=lf
+harness/score.sh               text eol=lf
+harness/lint.sh                text eol=lf
+harness/probe.sh               text eol=lf
+harness/status.sh              text eol=lf
+harness/dev_answers.json       text eol=lf
+harness/.checksums.json        text eol=lf
+spec.md                        text eol=lf
+goal.md                        text eol=lf
+dev/mock-server/seed/seed.json text eol=lf
