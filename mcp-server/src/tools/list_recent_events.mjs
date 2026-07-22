@@ -5,6 +5,11 @@ import { callLumenboard } from '../lumenboardClient.mjs';
 import { mapApiError } from '../errors.mjs';
 import { isValidAccountId, validateEventsResponse } from '../schemas.mjs';
 
+// Safety valve for cursor walking: a misbehaving/malicious API that returns an
+// endless or non-advancing cursor must not hang the tool forever (proposal §03,
+// "Resilience"). Overridable via input.maxPages for tests.
+const DEFAULT_MAX_PAGES = 10000;
+
 export const description =
   'Returns recent product events (login, dashboard_view, report_export, invite_sent, seat_added, integration_connected), optionally filtered to one account and/or a since date, walking all result pages internally, plus a per-type count summary. Use to see what an account has actually been doing — including positive signals like seat_added — not just its risk score.';
 
@@ -21,10 +26,16 @@ export async function listRecentEvents(input = {}) {
     return { ok: false, message: 'limit, if provided, must be a positive integer.' };
   }
 
+  const maxPages = Number.isInteger(input.maxPages) && input.maxPages > 0 ? input.maxPages : DEFAULT_MAX_PAGES;
   const all = [];
   const seenIds = new Set();
+  const seenCursors = new Set();
   let cursor;
+  let pages = 0;
   for (;;) {
+    if (++pages > maxPages) {
+      return { ok: false, message: 'Stopped reading events: the API kept paginating past the safe limit — it may be returning an endless cursor. Try a narrower `since`.' };
+    }
     const params = new URLSearchParams();
     if (since) params.set('since', since);
     if (cursor) params.set('cursor', cursor);
@@ -38,8 +49,13 @@ export async function listRecentEvents(input = {}) {
       seenIds.add(ev.id);
       all.push(ev);
     }
-    cursor = res.data.next_cursor;
-    if (!cursor) break;
+    const next = res.data.next_cursor;
+    if (!next) break;
+    if (seenCursors.has(next)) {
+      return { ok: false, message: 'Stopped reading events: the pagination cursor stopped advancing (repeated), aborting to avoid an infinite loop.' };
+    }
+    seenCursors.add(next);
+    cursor = next;
   }
 
   let events = account_id ? all.filter((e) => e.account_id === account_id) : all;

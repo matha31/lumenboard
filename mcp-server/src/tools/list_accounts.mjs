@@ -8,11 +8,17 @@ import { validateAccountsResponse, validateUsersPage } from '../schemas.mjs';
 export const description =
   'Plain directory of every account (name, plan, seats, MRR, health score, and renewal date) for browsing or looking up one specific customer by name. Returns everything unfiltered and unsorted; nothing here is prioritized.';
 
+// Safety valve: never walk /users forever if the API keeps claiming has_next
+// (proposal §03, "Resilience"). Overridable via opts.maxPages for tests.
+const DEFAULT_MAX_PAGES = 10000;
+
 async function fetchAllUsers(opts) {
   const users = [];
   let page = 1;
   const pageSize = 100;
+  const maxPages = Number.isInteger(opts.maxPages) && opts.maxPages > 0 ? opts.maxPages : DEFAULT_MAX_PAGES;
   for (;;) {
+    if (page > maxPages) return { ok: false, overflow: true };
     const res = await callLumenboard(`/users?page=${page}&pageSize=${pageSize}`, opts);
     if (!res.ok) return { ok: false, error: res };
     const shape = validateUsersPage(res.data);
@@ -32,6 +38,9 @@ export async function listAccounts(input = {}) {
 
   const usersRes = await fetchAllUsers(input);
   if (usersRes.shapeError) return usersRes.shapeError;
+  if (usersRes.overflow) {
+    return { ok: false, message: 'Stopped reading the user directory: /users kept reporting more pages past the safe limit — the API may be paginating endlessly.' };
+  }
   const userCounts = new Map();
   if (usersRes.ok) {
     for (const u of usersRes.users) {
