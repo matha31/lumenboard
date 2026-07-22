@@ -2,3 +2,10 @@ node_modules/
 .env
 *.log
 .DS_Store
+
+# harness runtime artifacts — not source, regenerated per run
+harness/.started_at
+harness/.score_history.jsonl
+harness/.holdout_calls.json
+harness/.lint_findings.json
+harness/.probe_seed.json

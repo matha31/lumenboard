@@ -1,0 +1,14 @@
+{
+  "harness/score.js": "35288a8dad0969c0c06fd6d6e7f24176aaa7a56e84a827323e2855776876a50f",
+  "harness/lint.js": "7423697616ef6aafb3062186048b97055fa162397c28f9b9ac6a0af133645fec",
+  "harness/probe.js": "4f44d018ee423c255d6319e864d2e4f0b5f5c60be5ff9eaafdf243881a048bfc",
+  "harness/status.js": "44f5bc72b360c0d749c85c85b299bbe9cf90ff5cd50d85af2de789540fa338ca",
+  "harness/score.sh": "a9f883f8ad36ae51a6d9ac184860c6a6f080f7e8e69652cfc5a31350ba095482",
+  "harness/lint.sh": "cedc55131e9dedd30f0e76b7338d6d4807202076da7a34583bab172035e6cd16",
+  "harness/probe.sh": "e5abed6853e37b3b175a378e5a658bbba4f5967935b3a7f8b62d4c8923381549",
+  "harness/status.sh": "bc23cd3cbb4c364a57173962463b3c2757c1a85548c8e54b9e33ae0e172760de",
+  "harness/dev_answers.json": "0d5e4064e1f41c7add45352daf1d08a6aeeb913e39d1ec2ab2c86c2f8b92a0bc",
+  "spec.md": "717b69602a80b1166cfcb96d59994d3fd8d634b2c4703e07cd3699686af0bacf",
+  "goal.md": "b2af0ec7c4028da7d4eca91644a89139121e78a229ce23fbad7058c6c366cb86",
+  "dev/mock-server/seed/seed.json": "f2f4b80177a9716d2071d991bfe52856130497e248a9034fce1c3f1652fbd81a"
+}
