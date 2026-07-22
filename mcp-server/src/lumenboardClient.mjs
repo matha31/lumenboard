@@ -15,8 +15,20 @@ function envDefault(name) {
   return undefined;
 }
 
+// `base` may be a bare origin (`http://host`), an absolute base that carries a
+// path prefix (`http://host/api`), or a same-origin relative prefix (`/api`, as
+// the artifact uses behind its dev-proxy). Join it to `path` as a prefix and
+// resolve relative bases against the page origin. `new URL(path, base)` can't do
+// this: it rejects a relative base outright, and when `path` is absolute it
+// discards the base's own path — so `/api` + `/accounts` would silently become
+// `/accounts` and miss the proxy.
+function buildRequestUrl(path, base) {
+  const origin = (typeof window !== 'undefined' && window.location) ? window.location.origin : undefined;
+  return new URL(String(base).replace(/\/+$/, '') + path, origin);
+}
+
 async function doRequest(path, base, key) {
-  const url = new URL(path, base);
+  const url = buildRequestUrl(path, base);
   const res = await fetch(url, {
     headers: { 'x-api-key': key },
   });
