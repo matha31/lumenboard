@@ -22,11 +22,20 @@ function main() {
   const elapsedHours = startedAt ? (Date.now() - startedAt) / 3600000 : 0;
   const history = readJsonl(path.join(REPO_ROOT, 'harness', '.score_history.jsonl'));
 
-  const holdoutCallsPath = path.join(REPO_ROOT, 'harness', '.holdout_calls.json');
-  let holdoutCalls = [];
-  if (fs.existsSync(holdoutCallsPath)) { try { holdoutCalls = JSON.parse(fs.readFileSync(holdoutCallsPath, 'utf8')); } catch (_) {} }
-  const dayAgo = Date.now() - 24 * 3600 * 1000;
-  const recentHoldoutCalls = holdoutCalls.filter((t) => t > dayAgo).length;
+  // The holdout ledger lives beside the private holdout data (outside the repo),
+  // so it's readable here only when LFD_HOLDOUT_DATA is set — i.e. when the human
+  // runs status. Under the human-gated holdout model the optimizer does NOT have
+  // that env var, so it sees the budget as "unknown" rather than a repo-local file
+  // it could tamper with.
+  const holdoutDataPath = process.env.LFD_HOLDOUT_DATA;
+  let recentHoldoutCalls = null;
+  if (holdoutDataPath) {
+    const holdoutCallsPath = path.join(path.dirname(holdoutDataPath), '.holdout_calls.json');
+    let holdoutCalls = [];
+    if (fs.existsSync(holdoutCallsPath)) { try { holdoutCalls = JSON.parse(fs.readFileSync(holdoutCallsPath, 'utf8')); } catch (_) {} }
+    const dayAgo = Date.now() - 24 * 3600 * 1000;
+    recentHoldoutCalls = holdoutCalls.filter((t) => t > dayAgo).length;
+  }
 
   const devHistory = history.filter((h) => h.mode === 'dev');
   const last5 = devHistory.slice(-5);
@@ -44,8 +53,8 @@ function main() {
     dev_score_cycles_run: devHistory.length,
     last_5_dev_accuracy: last5.map((h) => h.accuracy),
     gain_per_step_last_5: gainPerStep === null ? null : Math.round(gainPerStep * 1000) / 1000,
-    holdout_calls_used_last_24h: recentHoldoutCalls,
-    holdout_calls_remaining_24h: Math.max(0, HOLDOUT_RATE_LIMIT_PER_DAY - recentHoldoutCalls),
+    holdout_calls_used_last_24h: recentHoldoutCalls === null ? 'unknown — human-gated; LFD_HOLDOUT_DATA not set in this environment' : recentHoldoutCalls,
+    holdout_calls_remaining_24h: recentHoldoutCalls === null ? 'unknown — holdout checks are run by the human, not from here' : Math.max(0, HOLDOUT_RATE_LIMIT_PER_DAY - recentHoldoutCalls),
     token_burn: 'unknown — not observable from this script; track manually against your own session usage',
   }, null, 2));
 }

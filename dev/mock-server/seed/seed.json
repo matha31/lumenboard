@@ -440,6 +440,28 @@
       "renewal_date": "2026-12-14",
       "created_date": "2026-03-24",
       "last_active_date": "2026-07-18"
+    },
+    {
+      "id": "acc_0041",
+      "name": "Cobalt Systems",
+      "plan": "pro",
+      "seats": 88,
+      "mrr": 7420.5,
+      "health_score": 12,
+      "renewal_date": "2026-11-29",
+      "created_date": "2024-11-04",
+      "last_active_date": "2026-07-18"
+    },
+    {
+      "id": "acc_0042",
+      "name": "Marble Ridge",
+      "plan": "enterprise",
+      "seats": 210,
+      "mrr": 15880,
+      "health_score": 8,
+      "renewal_date": "2026-12-19",
+      "created_date": "2024-08-15",
+      "last_active_date": "2026-07-17"
     }
   ],
   "users": [
@@ -1738,6 +1760,60 @@
       "last_active": "2026-06-22",
       "plan": "starter",
       "account_id": "acc_0040"
+    },
+    {
+      "id": "usr_0145",
+      "name": "User 145",
+      "email": "user145@cobaltsystems.example",
+      "signup_date": "2025-01-10",
+      "last_active": "2026-07-14",
+      "plan": "pro",
+      "account_id": "acc_0041"
+    },
+    {
+      "id": "usr_0146",
+      "name": "User 146",
+      "email": "user146@cobaltsystems.example",
+      "signup_date": "2025-03-22",
+      "last_active": "2026-07-10",
+      "plan": "pro",
+      "account_id": "acc_0041"
+    },
+    {
+      "id": "usr_0147",
+      "name": "User 147",
+      "email": "user147@cobaltsystems.example",
+      "signup_date": "2025-06-01",
+      "last_active": "2026-06-28",
+      "plan": "pro",
+      "account_id": "acc_0041"
+    },
+    {
+      "id": "usr_0148",
+      "name": "User 148",
+      "email": "user148@marbleridge.example",
+      "signup_date": "2024-09-30",
+      "last_active": "2026-07-15",
+      "plan": "enterprise",
+      "account_id": "acc_0042"
+    },
+    {
+      "id": "usr_0149",
+      "name": "User 149",
+      "email": "user149@marbleridge.example",
+      "signup_date": "2024-12-12",
+      "last_active": "2026-07-09",
+      "plan": "enterprise",
+      "account_id": "acc_0042"
+    },
+    {
+      "id": "usr_0150",
+      "name": "User 150",
+      "email": "user150@marbleridge.example",
+      "signup_date": "2025-02-18",
+      "last_active": "2026-06-30",
+      "plan": "enterprise",
+      "account_id": "acc_0042"
     }
   ],
   "usage": {
@@ -4219,6 +4295,130 @@
         "week_start": "2026-07-15",
         "active_users": 18,
         "events": 25
+      }
+    ],
+    "acc_0041": [
+      {
+        "week_start": "2026-04-29",
+        "active_users": 41,
+        "events": 12
+      },
+      {
+        "week_start": "2026-05-06",
+        "active_users": 40,
+        "events": 12
+      },
+      {
+        "week_start": "2026-05-13",
+        "active_users": 39,
+        "events": 12
+      },
+      {
+        "week_start": "2026-05-20",
+        "active_users": 35,
+        "events": 11
+      },
+      {
+        "week_start": "2026-05-27",
+        "active_users": 31,
+        "events": 9
+      },
+      {
+        "week_start": "2026-06-03",
+        "active_users": 27,
+        "events": 8
+      },
+      {
+        "week_start": "2026-06-10",
+        "active_users": 23,
+        "events": 7
+      },
+      {
+        "week_start": "2026-06-17",
+        "active_users": 20,
+        "events": 6
+      },
+      {
+        "week_start": "2026-06-24",
+        "active_users": 17,
+        "events": 5
+      },
+      {
+        "week_start": "2026-07-01",
+        "active_users": 14,
+        "events": 4
+      },
+      {
+        "week_start": "2026-07-08",
+        "active_users": 12,
+        "events": 4
+      },
+      {
+        "week_start": "2026-07-15",
+        "active_users": 11,
+        "events": 3
+      }
+    ],
+    "acc_0042": [
+      {
+        "week_start": "2026-04-29",
+        "active_users": 51,
+        "events": 15
+      },
+      {
+        "week_start": "2026-05-06",
+        "active_users": 50,
+        "events": 15
+      },
+      {
+        "week_start": "2026-05-13",
+        "active_users": 49,
+        "events": 15
+      },
+      {
+        "week_start": "2026-05-20",
+        "active_users": 45,
+        "events": 14
+      },
+      {
+        "week_start": "2026-05-27",
+        "active_users": 40,
+        "events": 12
+      },
+      {
+        "week_start": "2026-06-03",
+        "active_users": 35,
+        "events": 11
+      },
+      {
+        "week_start": "2026-06-10",
+        "active_users": 30,
+        "events": 9
+      },
+      {
+        "week_start": "2026-06-17",
+        "active_users": 26,
+        "events": 8
+      },
+      {
+        "week_start": "2026-06-24",
+        "active_users": 22,
+        "events": 7
+      },
+      {
+        "week_start": "2026-07-01",
+        "active_users": 19,
+        "events": 6
+      },
+      {
+        "week_start": "2026-07-08",
+        "active_users": 18,
+        "events": 5
+      },
+      {
+        "week_start": "2026-07-15",
+        "active_users": 17,
+        "events": 5
       }
     ]
   },
@@ -48735,6 +48935,90 @@
       "user_id": "usr_0144",
       "type": "login",
       "occurred_at": "2026-07-21T18:34:26.000Z"
+    },
+    {
+      "id": "evt_acc_0041_00001",
+      "account_id": "acc_0041",
+      "user_id": "usr_0145",
+      "type": "login",
+      "occurred_at": "2026-05-02T09:14:00.000Z"
+    },
+    {
+      "id": "evt_acc_0041_00002",
+      "account_id": "acc_0041",
+      "user_id": "usr_0146",
+      "type": "dashboard_view",
+      "occurred_at": "2026-05-19T11:03:00.000Z"
+    },
+    {
+      "id": "evt_acc_0041_00003",
+      "account_id": "acc_0041",
+      "user_id": "usr_0147",
+      "type": "report_export",
+      "occurred_at": "2026-06-05T14:22:00.000Z"
+    },
+    {
+      "id": "evt_acc_0041_00004",
+      "account_id": "acc_0041",
+      "user_id": "usr_0145",
+      "type": "invite_sent",
+      "occurred_at": "2026-06-20T08:41:00.000Z"
+    },
+    {
+      "id": "evt_acc_0041_00005",
+      "account_id": "acc_0041",
+      "user_id": "usr_0146",
+      "type": "integration_connected",
+      "occurred_at": "2026-07-02T16:09:00.000Z"
+    },
+    {
+      "id": "evt_acc_0041_00006",
+      "account_id": "acc_0041",
+      "user_id": "usr_0147",
+      "type": "seat_added",
+      "occurred_at": "2026-07-13T10:55:00.000Z"
+    },
+    {
+      "id": "evt_acc_0042_00001",
+      "account_id": "acc_0042",
+      "user_id": "usr_0148",
+      "type": "login",
+      "occurred_at": "2026-05-04T07:30:00.000Z"
+    },
+    {
+      "id": "evt_acc_0042_00002",
+      "account_id": "acc_0042",
+      "user_id": "usr_0149",
+      "type": "dashboard_view",
+      "occurred_at": "2026-05-21T13:12:00.000Z"
+    },
+    {
+      "id": "evt_acc_0042_00003",
+      "account_id": "acc_0042",
+      "user_id": "usr_0150",
+      "type": "report_export",
+      "occurred_at": "2026-06-07T15:47:00.000Z"
+    },
+    {
+      "id": "evt_acc_0042_00004",
+      "account_id": "acc_0042",
+      "user_id": "usr_0148",
+      "type": "invite_sent",
+      "occurred_at": "2026-06-22T09:05:00.000Z"
+    },
+    {
+      "id": "evt_acc_0042_00005",
+      "account_id": "acc_0042",
+      "user_id": "usr_0149",
+      "type": "integration_connected",
+      "occurred_at": "2026-07-03T12:38:00.000Z"
+    },
+    {
+      "id": "evt_acc_0042_00006",
+      "account_id": "acc_0042",
+      "user_id": "usr_0150",
+      "type": "seat_added",
+      "occurred_at": "2026-07-14T17:20:00.000Z"
     }
   ]
 }

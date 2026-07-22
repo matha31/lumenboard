@@ -141,7 +141,10 @@ async function main() {
       console.log('HOLDOUT_UNAVAILABLE: LFD_HOLDOUT_DATA not configured in this environment.');
       process.exit(1);
     }
-    const rateLimitPath = path.join(REPO_ROOT, 'harness', '.holdout_calls.json');
+    // Ledger lives OUTSIDE the repo, beside the private holdout data, so the
+    // optimizer (whose write surface is the repo) cannot delete it to reset the
+    // 3-calls/24h limit and hill-climb holdout. privatePath is validated above.
+    const rateLimitPath = path.join(path.dirname(privatePath), '.holdout_calls.json');
     let calls = [];
     if (fs.existsSync(rateLimitPath)) { try { calls = JSON.parse(fs.readFileSync(rateLimitPath, 'utf8')); } catch (_) { calls = []; } }
     const dayAgo = Date.now() - 24 * 3600 * 1000;

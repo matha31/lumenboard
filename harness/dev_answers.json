@@ -121,6 +121,10 @@
     "acc_0040": {
       "bucket": "healthy",
       "combined_risk": 0.024
+    },
+    "acc_0042": {
+      "bucket": "watch",
+      "combined_risk": 0.768
     }
   }
 }
