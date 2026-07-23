@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!--
+  Static snapshot of the Lumenboard Weekly Risk Digest artifact.
+  Self-contained: all styles, logic, and a frozen SYNTHETIC reference data
+  snapshot (reference_date 2026-07-22) are embedded inline, so this file
+  renders by simply opening it in a browser - no API key, no dev-proxy, no
+  server required. For the live, API-backed version see index.html (+
+  dev-proxy.mjs). Generated from the published claude.ai artifact; holds no
+  credentials.
+-->
+
+<title>Lumenboard — Weekly Risk Digest</title>
+<style>
+  :root {
+    --bg: #eaeef3; --panel: #ffffff; --card: #ffffff; --card-2: #f5f8fb;
+    --ink: #101722; --ink-soft: #56616f; --ink-faint: #8a94a2;
+    --line: #dde3ec; --line-soft: #e9edf3;
+    --accent: #0b8f95; --accent-ink: #0b8f95;
+    --urgent: #d6323a; --watch: #c07806; --healthy: #0f9d63;
+    --grid: #eef2f7; --spark: #7c8896;
+    --shadow: 0 1px 2px rgba(16,23,34,.05), 0 8px 24px -16px rgba(16,23,34,.18);
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c0e13; --panel: #13161d; --card: #161a22; --card-2: #1b212b;
+      --ink: #eef1f6; --ink-soft: #9aa4b2; --ink-faint: #6b7683;
+      --line: #242b37; --line-soft: #1e2530;
+      --accent: #2dd4bf; --accent-ink: #5fe3d2;
+      --urgent: #f2555a; --watch: #f0a92b; --healthy: #3ecf8e;
+      --grid: #1e2530; --spark: #8793a2;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -18px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #eaeef3; --panel: #ffffff; --card: #ffffff; --card-2: #f5f8fb;
+    --ink: #101722; --ink-soft: #56616f; --ink-faint: #8a94a2;
+    --line: #dde3ec; --line-soft: #e9edf3;
+    --accent: #0b8f95; --accent-ink: #0b8f95;
+    --urgent: #d6323a; --watch: #c07806; --healthy: #0f9d63;
+    --grid: #eef2f7; --spark: #7c8896;
+    --shadow: 0 1px 2px rgba(16,23,34,.05), 0 8px 24px -16px rgba(16,23,34,.18);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c0e13; --panel: #13161d; --card: #161a22; --card-2: #1b212b;
+    --ink: #eef1f6; --ink-soft: #9aa4b2; --ink-faint: #6b7683;
+    --line: #242b37; --line-soft: #1e2530;
+    --accent: #2dd4bf; --accent-ink: #5fe3d2;
+    --urgent: #f2555a; --watch: #f0a92b; --healthy: #3ecf8e;
+    --grid: #1e2530; --spark: #8793a2;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px -18px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .wrap {
+    font-family: var(--font-sans); color: var(--ink); background: var(--bg);
+    min-height: 100vh; padding: 28px clamp(16px, 4vw, 44px) 64px;
+    -webkit-font-smoothing: antialiased; font-size: 15px; line-height: 1.5;
+  }
+  .masthead { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .title { font-size: clamp(22px, 3.2vw, 30px); font-weight: 720; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+  .title .lume { color: var(--accent-ink); }
+  .sub { margin: 6px 0 0; color: var(--ink-soft); max-width: 62ch; }
+  .asof { font-family: var(--font-mono); font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+  .asof b { color: var(--ink-soft); font-weight: 600; }
+
+  /* KPI summary — the glanceable state before the detail */
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin: 22px 0 8px; }
+  @media (max-width: 640px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .kpi .lab { display: flex; align-items: center; gap: 7px; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); font-weight: 600; }
+  .kpi .num { font-size: 30px; font-weight: 720; letter-spacing: -.02em; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .kpi .foot { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .dot.urgent { background: var(--urgent); } .dot.watch { background: var(--watch); } .dot.healthy { background: var(--healthy); }
+  .dot.accent { background: var(--accent); }
+
+  /* toolbar */
+  .toolbar { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin: 18px 0 22px; padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); font-weight: 600; }
+  .field select, .field input { font: inherit; font-size: 14px; color: var(--ink); background: var(--card-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 150px; }
+  .field input::placeholder { color: var(--ink-faint); }
+  .field select:focus-visible, .field input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .spacer { flex: 1; }
+  .count-note { font-size: 13px; color: var(--ink-soft); align-self: center; font-variant-numeric: tabular-nums; }
+
+  /* buckets + cards */
+  .bucket { margin-top: 26px; }
+  .bucket-head { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+  .bucket-head h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .09em; margin: 0; font-weight: 700; }
+  .bucket-head .pill { font-family: var(--font-mono); font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
+  .b-urgent .pill { color: var(--urgent); background: color-mix(in srgb, var(--urgent) 14%, transparent); }
+  .b-watch .pill { color: var(--watch); background: color-mix(in srgb, var(--watch) 16%, transparent); }
+  .b-healthy .pill { color: var(--healthy); background: color-mix(in srgb, var(--healthy) 14%, transparent); }
+  .bucket-head .rail { flex: 1; height: 1px; background: var(--line); }
+
+  .cards { display: flex; flex-direction: column; gap: 9px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-left-width: 3px; border-radius: 11px; box-shadow: var(--shadow); overflow: hidden; }
+  .b-urgent .card { border-left-color: var(--urgent); }
+  .b-watch .card { border-left-color: var(--watch); }
+  .b-healthy .card { border-left-color: var(--healthy); }
+  .card-top { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: baseline; width: 100%; text-align: left; background: none; border: 0; color: inherit; font: inherit; padding: 14px 16px; cursor: pointer; }
+  .card-top:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 10px; }
+  .name { font-weight: 650; font-size: 15.5px; }
+  .name .plan { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); font-weight: 600; margin-left: 7px; }
+  .meta { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .reason { grid-column: 1 / -1; color: var(--ink-soft); font-size: 13.5px; margin-top: 3px; }
+  .reason .chev { color: var(--ink-faint); transition: transform .18s ease; display: inline-block; margin-left: 2px; }
+  .card.open .chev { transform: rotate(90deg); }
+  .flag { margin-left: 8px; font-size: 11px; color: var(--watch); background: color-mix(in srgb, var(--watch) 14%, transparent); padding: 1px 7px; border-radius: 999px; }
+
+  .detail { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .22s ease; }
+  .card.open .detail { grid-template-rows: 1fr; }
+  .detail-inner { overflow: hidden; }
+  .detail-pad { padding: 2px 16px 15px; display: flex; gap: 22px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line-soft); margin-top: 2px; padding-top: 13px; }
+  .spark-wrap { display: flex; flex-direction: column; gap: 4px; }
+  .spark-cap { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font-size: 12px; font-family: var(--font-mono); padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-soft); background: var(--card-2); }
+  .chip.pos { color: var(--healthy); border-color: color-mix(in srgb, var(--healthy) 40%, var(--line)); }
+  .chip .n { color: var(--ink); font-weight: 600; }
+  .empty { color: var(--ink-faint); font-size: 13px; padding: 10px 2px; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <h1 class="title"><span class="lume">Lumen</span>board — Weekly Risk Digest</h1>
+      <p class="sub">Every account ranked by churn exposure — health score, usage-trend, and renewal proximity combined into one score, so you know who to call Monday morning.</p>
+    </div>
+    <div class="asof">as of <b id="asof-date">—</b><br>reference snapshot</div>
+  </header>
+
+  <section class="kpis" id="kpis"></section>
+
+  <div class="toolbar">
+    <div class="field"><label for="f-search">Find account</label><input id="f-search" type="search" placeholder="name…" autocomplete="off" /></div>
+    <div class="field"><label for="f-plan">Plan</label>
+      <select id="f-plan"><option value="">All plans</option><option value="starter">Starter</option><option value="pro">Pro</option><option value="enterprise">Enterprise</option></select>
+    </div>
+    <div class="field"><label for="f-window">Renewal within</label>
+      <select id="f-window"><option value="">Any time</option><option value="30">30 days</option><option value="60">60 days</option><option value="90">90 days</option></select>
+    </div>
+    <div class="field"><label for="f-sort">Sort by</label>
+      <select id="f-sort"><option value="risk">Risk (high → low)</option><option value="mrr">MRR (high → low)</option><option value="renewal">Renewal (soonest)</option><option value="name">Name (A → Z)</option></select>
+    </div>
+    <div class="spacer"></div>
+    <div class="count-note" id="count-note"></div>
+  </div>
+
+  <main id="board"></main>
+</div>
+
+<script>
+const DATA = {"reference_date":"2026-07-22","accounts":[{"id":"acc_0001","name":"Nimbus Studio","plan":"enterprise","seats":164,"mrr":5093.99,"health_score":87,"renewal_date":"2026-10-31"},{"id":"acc_0002","name":"Zenith Holdings","plan":"starter","seats":139,"mrr":12563.68,"health_score":80,"renewal_date":"2026-12-20"},{"id":"acc_0003","name":"Ironclad Holdings","plan":"enterprise","seats":149,"mrr":4605.91,"health_score":81,"renewal_date":"2026-10-22"},{"id":"acc_0004","name":"Hollowbrook Partners","plan":"starter","seats":186,"mrr":15169.37,"health_score":92,"renewal_date":"2026-12-30"},{"id":"acc_0005","name":"Argon Works","plan":"starter","seats":14,"mrr":1207.88,"health_score":93,"renewal_date":"2026-10-20"},{"id":"acc_0006","name":"Yardstick Systems","plan":"enterprise","seats":165,"mrr":12253.18,"health_score":92,"renewal_date":"2026-11-24"},{"id":"acc_0007","name":"Northgate Holdings","plan":"starter","seats":93,"mrr":9108.26,"health_score":83,"renewal_date":"2026-10-23"},{"id":"acc_0008","name":"Inkwell Labs","plan":"pro","seats":137,"mrr":2938.46,"health_score":17,"renewal_date":"2026-08-09"},{"id":"acc_0009","name":"Ember Analytics","plan":"starter","seats":174,"mrr":10943.28,"health_score":21,"renewal_date":"2026-08-13"},{"id":"acc_0010","name":"Driftwood Systems","plan":"starter","seats":116,"mrr":4999.27,"health_score":24,"renewal_date":"2026-08-05"},{"id":"acc_0011","name":"Everline Partners","plan":"enterprise","seats":53,"mrr":5516.99,"health_score":11,"renewal_date":"2026-08-12"},{"id":"acc_0012","name":"Cobalt Studio","plan":"starter","seats":3,"mrr":276.83,"health_score":14,"renewal_date":"2026-08-07"},{"id":"acc_0013","name":"Beacon Networks","plan":"starter","seats":143,"mrr":11075.65,"health_score":13,"renewal_date":"2026-08-15"},{"id":"acc_0014","name":"Everline Systems","plan":"starter","seats":133,"mrr":10711.57,"health_score":15,"renewal_date":"2026-11-16"},{"id":"acc_0015","name":"Northgate Collective","plan":"starter","seats":219,"mrr":7365.02,"health_score":16,"renewal_date":"2026-11-07"},{"id":"acc_0016","name":"Wildwood Networks","plan":"starter","seats":175,"mrr":5314.97,"health_score":29,"renewal_date":"2026-11-29"},{"id":"acc_0017","name":"Kestrel Systems","plan":"starter","seats":202,"mrr":10060.13,"health_score":23,"renewal_date":"2026-12-04"},{"id":"acc_0018","name":"Cascade Partners","plan":"enterprise","seats":92,"mrr":9461.86,"health_score":32,"renewal_date":"2026-12-05"},{"id":"acc_0019","name":"Pinnacle Collective","plan":"starter","seats":41,"mrr":4275.4,"health_score":61,"renewal_date":"2026-10-18"},{"id":"acc_0020","name":"Umber Systems","plan":"enterprise","seats":31,"mrr":2700.51,"health_score":59,"renewal_date":"2026-10-14"},{"id":"acc_0021","name":"Vertex Collective","plan":"pro","seats":26,"mrr":3601.06,"health_score":60,"renewal_date":"2026-11-25"},{"id":"acc_0022","name":"Hollowbrook Networks","plan":"starter","seats":152,"mrr":14139.13,"health_score":60,"renewal_date":"2026-12-08"},{"id":"acc_0023","name":"Vertex Partners","plan":"enterprise","seats":135,"mrr":15647.48,"health_score":56,"renewal_date":"2026-11-14"},{"id":"acc_0024","name":"Ironclad Partners","plan":"starter","seats":216,"mrr":6836.65,"health_score":78,"renewal_date":"2026-08-16"},{"id":"acc_0025","name":"Kestrel Systems","plan":"pro","seats":63,"mrr":5323.1,"health_score":78,"renewal_date":"2026-08-02"},{"id":"acc_0026","name":"Hollowbrook Analytics","plan":"enterprise","seats":97,"mrr":13141.65,"health_score":81,"renewal_date":"2026-08-14"},{"id":"acc_0027","name":"Vantage Partners","plan":"starter","seats":126,"mrr":15202,"health_score":84,"renewal_date":"2026-08-06"},{"id":"acc_0028","name":"Brightwell Networks","plan":"pro","seats":157,"mrr":4697.78,"health_score":64,"renewal_date":"2026-11-17"},{"id":"acc_0029","name":"Cobalt Analytics","plan":"enterprise","seats":31,"mrr":4289.63,"health_score":64,"renewal_date":"2026-12-08"},{"id":"acc_0030","name":"Solstice Holdings","plan":"enterprise","seats":167,"mrr":14707.52,"health_score":61,"renewal_date":"2026-10-28"},{"id":"acc_0031","name":"Cobalt Studio","plan":"enterprise","seats":210,"mrr":17955.48,"health_score":58,"renewal_date":"2026-11-18"},{"id":"acc_0032","name":"Meridian Studio","plan":"enterprise","seats":151,"mrr":15112.39,"health_score":61,"renewal_date":"2026-11-12"},{"id":"acc_0033","name":"Cobalt Works","plan":"starter","seats":142,"mrr":15776.63,"health_score":30,"renewal_date":"2026-08-24"},{"id":"acc_0034","name":"Harbor Partners","plan":"starter","seats":60,"mrr":6082.29,"health_score":31,"renewal_date":"2026-08-21"},{"id":"acc_0035","name":"Vertex Studio","plan":"starter","seats":19,"mrr":1377.74,"health_score":35,"renewal_date":"2026-08-22"},{"id":"acc_0036","name":"Trestle Partners","plan":"pro","seats":196,"mrr":21057.02,"health_score":34,"renewal_date":"2026-08-19"},{"id":"acc_0037","name":"Hollowbrook Studio","plan":"starter","seats":147,"mrr":13948.16,"health_score":32,"renewal_date":"2026-08-23"},{"id":"acc_0038","name":"Brightwell Collective","plan":"pro","seats":196,"mrr":23129.16,"health_score":92,"renewal_date":"2026-11-24"},{"id":"acc_0039","name":"Wildwood Partners","plan":"starter","seats":102,"mrr":11647.55,"health_score":89,"renewal_date":"2026-10-21"},{"id":"acc_0040","name":"Ridgeline Group","plan":"starter","seats":215,"mrr":24767.95,"health_score":94,"renewal_date":"2026-12-14"},{"id":"acc_0041","name":"Cobalt Systems","plan":"pro","seats":88,"mrr":7420.5,"health_score":12,"renewal_date":"2026-11-29"},{"id":"acc_0042","name":"Marble Ridge","plan":"enterprise","seats":210,"mrr":15880,"health_score":8,"renewal_date":"2026-12-19"}],"usage":{"acc_0001":[{"week_start":"2026-04-29","active_users":18},{"week_start":"2026-05-06","active_users":19},{"week_start":"2026-05-13","active_users":19},{"week_start":"2026-05-20","active_users":19},{"week_start":"2026-05-27","active_users":20},{"week_start":"2026-06-03","active_users":20},{"week_start":"2026-06-10","active_users":19},{"week_start":"2026-06-17","active_users":19},{"week_start":"2026-06-24","active_users":23},{"week_start":"2026-07-01","active_users":21},{"week_start":"2026-07-08","active_users":22},{"week_start":"2026-07-15","active_users":23}],"acc_0002":[{"week_start":"2026-04-29","active_users":22},{"week_start":"2026-05-06","active_users":22},{"week_start":"2026-05-13","active_users":23},{"week_start":"2026-05-20","active_users":23},{"week_start":"2026-05-27","active_users":23},{"week_start":"2026-06-03","active_users":24},{"week_start":"2026-06-10","active_users":29},{"week_start":"2026-06-17","active_users":27},{"week_start":"2026-06-24","active_users":25},{"week_start":"2026-07-01","active_users":23},{"week_start":"2026-07-08","active_users":28},{"week_start":"2026-07-15","active_users":26}],"acc_0003":[{"week_start":"2026-04-29","active_users":19},{"week_start":"2026-05-06","active_users":19},{"week_start":"2026-05-13","active_users":20},{"week_start":"2026-05-20","active_users":20},{"week_start":"2026-05-27","active_users":19},{"week_start":"2026-06-03","active_users":20},{"week_start":"2026-06-10","active_users":21},{"week_start":"2026-06-17","active_users":20},{"week_start":"2026-06-24","active_users":23},{"week_start":"2026-07-01","active_users":24},{"week_start":"2026-07-08","active_users":26},{"week_start":"2026-07-15","active_users":24}],"acc_0004":[{"week_start":"2026-04-29","active_users":17},{"week_start":"2026-05-06","active_users":19},{"week_start":"2026-05-13","active_users":19},{"week_start":"2026-05-20","active_users":18},{"week_start":"2026-05-27","active_users":19},{"week_start":"2026-06-03","active_users":18},{"week_start":"2026-06-10","active_users":20},{"week_start":"2026-06-17","active_users":20},{"week_start":"2026-06-24","active_users":20},{"week_start":"2026-07-01","active_users":18},{"week_start":"2026-07-08","active_users":20},{"week_start":"2026-07-15","active_users":24}],"acc_0005":[{"week_start":"2026-04-29","active_users":8},{"week_start":"2026-05-06","active_users":8},{"week_start":"2026-05-13","active_users":8},{"week_start":"2026-05-20","active_users":9},{"week_start":"2026-05-27","active_users":9},{"week_start":"2026-06-03","active_users":10},{"week_start":"2026-06-10","active_users":10},{"week_start":"2026-06-17","active_users":9},{"week_start":"2026-06-24","active_users":9},{"week_start":"2026-07-01","active_users":10},{"week_start":"2026-07-08","active_users":10},{"week_start":"2026-07-15","active_users":11}],"acc_0006":[{"week_start":"2026-04-29","active_users":6},{"week_start":"2026-05-06","active_users":6},{"week_start":"2026-05-13","active_users":6},{"week_start":"2026-05-20","active_users":6},{"week_start":"2026-05-27","active_users":7},{"week_start":"2026-06-03","active_users":7},{"week_start":"2026-06-10","active_users":7},{"week_start":"2026-06-17","active_users":7},{"week_start":"2026-06-24","active_users":6},{"week_start":"2026-07-01","active_users":8},{"week_start":"2026-07-08","active_users":8},{"week_start":"2026-07-15","active_users":7}],"acc_0007":[{"week_start":"2026-04-29","active_users":19},{"week_start":"2026-05-06","active_users":19},{"week_start":"2026-05-13","active_users":21},{"week_start":"2026-05-20","active_users":21},{"week_start":"2026-05-27","active_users":21},{"week_start":"2026-06-03","active_users":20},{"week_start":"2026-06-10","active_users":19},{"week_start":"2026-06-17","active_users":22},{"week_start":"2026-06-24","active_users":24},{"week_start":"2026-07-01","active_users":26},{"week_start":"2026-07-08","active_users":23},{"week_start":"2026-07-15","active_users":24}],"acc_0008":[{"week_start":"2026-04-29","active_users":19},{"week_start":"2026-05-06","active_users":19},{"week_start":"2026-05-13","active_users":19},{"week_start":"2026-05-20","active_users":15},{"week_start":"2026-05-27","active_users":17},{"week_start":"2026-06-03","active_users":15},{"week_start":"2026-06-10","active_users":13},{"week_start":"2026-06-17","active_users":12},{"week_start":"2026-06-24","active_users":12},{"week_start":"2026-07-01","active_users":9},{"week_start":"2026-07-08","active_users":10},{"week_start":"2026-07-15","active_users":11}],"acc_0009":[{"week_start":"2026-04-29","active_users":4},{"week_start":"2026-05-06","active_users":4},{"week_start":"2026-05-13","active_users":4},{"week_start":"2026-05-20","active_users":4},{"week_start":"2026-05-27","active_users":3},{"week_start":"2026-06-03","active_users":3},{"week_start":"2026-06-10","active_users":3},{"week_start":"2026-06-17","active_users":3},{"week_start":"2026-06-24","active_users":2},{"week_start":"2026-07-01","active_users":2},{"week_start":"2026-07-08","active_users":2},{"week_start":"2026-07-15","active_users":2}],"acc_0010":[{"week_start":"2026-04-29","active_users":19},{"week_start":"2026-05-06","active_users":18},{"week_start":"2026-05-13","active_users":17},{"week_start":"2026-05-20","active_users":16},{"week_start":"2026-05-27","active_users":15},{"week_start":"2026-06-03","active_users":16},{"week_start":"2026-06-10","active_users":16},{"week_start":"2026-06-17","active_users":12},{"week_start":"2026-06-24","active_users":12},{"week_start":"2026-07-01","active_users":13},{"week_start":"2026-07-08","active_users":8},{"week_start":"2026-07-15","active_users":9}],"acc_0011":[{"week_start":"2026-04-29","active_users":16},{"week_start":"2026-05-06","active_users":16},{"week_start":"2026-05-13","active_users":13},{"week_start":"2026-05-20","active_users":12},{"week_start":"2026-05-27","active_users":12},{"week_start":"2026-06-03","active_users":12},{"week_start":"2026-06-10","active_users":9},{"week_start":"2026-06-17","active_users":9},{"week_start":"2026-06-24","active_users":9},{"week_start":"2026-07-01","active_users":8},{"week_start":"2026-07-08","active_users":6},{"week_start":"2026-07-15","active_users":7}],"acc_0012":[{"week_start":"2026-04-29","active_users":15},{"week_start":"2026-05-06","active_users":14},{"week_start":"2026-05-13","active_users":13},{"week_start":"2026-05-20","active_users":12},{"week_start":"2026-05-27","active_users":13},{"week_start":"2026-06-03","active_users":11},{"week_start":"2026-06-10","active_users":12},{"week_start":"2026-06-17","active_users":9},{"week_start":"2026-06-24","active_users":11},{"week_start":"2026-07-01","active_users":9},{"week_start":"2026-07-08","active_users":8},{"week_start":"2026-07-15","active_users":8}],"acc_0013":[{"week_start":"2026-04-29","active_users":5},{"week_start":"2026-05-06","active_users":5},{"week_start":"2026-05-13","active_users":4},{"week_start":"2026-05-20","active_users":4},{"week_start":"2026-05-27","active_users":4},{"week_start":"2026-06-03","active_users":4},{"week_start":"2026-06-10","active_users":4},{"week_start":"2026-06-17","active_users":3},{"week_start":"2026-06-24","active_users":3},{"week_start":"2026-07-01","active_users":2},{"week_start":"2026-07-08","active_users":3},{"week_start":"2026-07-15","active_users":3}],"acc_0014":[{"week_start":"2026-04-29","active_users":20},{"week_start":"2026-05-06","active_users":21},{"week_start":"2026-05-13","active_users":19},{"week_start":"2026-05-20","active_users":22},{"week_start":"2026-05-27","active_users":20},{"week_start":"2026-06-03","active_users":18},{"week_start":"2026-06-10","active_users":17},{"week_start":"2026-06-17","active_users":18},{"week_start":"2026-06-24","active_users":17},{"week_start":"2026-07-01","active_users":18},{"week_start":"2026-07-08","active_users":18},{"week_start":"2026-07-15","active_users":16}],"acc_0015":[{"week_start":"2026-04-29","active_users":18},{"week_start":"2026-05-06","active_users":17},{"week_start":"2026-05-13","active_users":18},{"week_start":"2026-05-20","active_users":17},{"week_start":"2026-05-27","active_users":16},{"week_start":"2026-06-03","active_users":17},{"week_start":"2026-06-10","active_users":17},{"week_start":"2026-06-17","active_users":16},{"week_start":"2026-06-24","active_users":18},{"week_start":"2026-07-01","active_users":14},{"week_start":"2026-07-08","active_users":13},{"week_start":"2026-07-15","active_users":16}],"acc_0016":[{"week_start":"2026-04-29","active_users":7},{"week_start":"2026-05-06","active_users":7},{"week_start":"2026-05-13","active_users":7},{"week_start":"2026-05-20","active_users":6},{"week_start":"2026-05-27","active_users":7},{"week_start":"2026-06-03","active_users":7},{"week_start":"2026-06-10","active_users":6},{"week_start":"2026-06-17","active_users":6},{"week_start":"2026-06-24","active_users":6},{"week_start":"2026-07-01","active_users":6},{"week_start":"2026-07-08","active_users":6},{"week_start":"2026-07-15","active_users":6}],"acc_0017":[{"week_start":"2026-04-29","active_users":4},{"week_start":"2026-05-06","active_users":4},{"week_start":"2026-05-13","active_users":4},{"week_start":"2026-05-20","active_users":4},{"week_start":"2026-05-27","active_users":4},{"week_start":"2026-06-03","active_users":4},{"week_start":"2026-06-10","active_users":4},{"week_start":"2026-06-17","active_users":4},{"week_start":"2026-06-24","active_users":3},{"week_start":"2026-07-01","active_users":3},{"week_start":"2026-07-08","active_users":4},{"week_start":"2026-07-15","active_users":4}],"acc_0018":[{"week_start":"2026-04-29","active_users":7},{"week_start":"2026-05-06","active_users":7},{"week_start":"2026-05-13","active_users":7},{"week_start":"2026-05-20","active_users":6},{"week_start":"2026-05-27","active_users":7},{"week_start":"2026-06-03","active_users":6},{"week_start":"2026-06-10","active_users":6},{"week_start":"2026-06-17","active_users":6},{"week_start":"2026-06-24","active_users":6},{"week_start":"2026-07-01","active_users":6},{"week_start":"2026-07-08","active_users":6},{"week_start":"2026-07-15","active_users":7}],"acc_0019":[{"week_start":"2026-04-29","active_users":17},{"week_start":"2026-05-06","active_users":16},{"week_start":"2026-05-13","active_users":15},{"week_start":"2026-05-20","active_users":13},{"week_start":"2026-05-27","active_users":12},{"week_start":"2026-06-03","active_users":12},{"week_start":"2026-06-10","active_users":12},{"week_start":"2026-06-17","active_users":10},{"week_start":"2026-06-24","active_users":9},{"week_start":"2026-07-01","active_users":9},{"week_start":"2026-07-08","active_users":10},{"week_start":"2026-07-15","active_users":8}],"acc_0020":[{"week_start":"2026-04-29","active_users":6},{"week_start":"2026-05-06","active_users":6},{"week_start":"2026-05-13","active_users":6},{"week_start":"2026-05-20","active_users":5},{"week_start":"2026-05-27","active_users":5},{"week_start":"2026-06-03","active_users":4},{"week_start":"2026-06-10","active_users":4},{"week_start":"2026-06-17","active_users":3},{"week_start":"2026-06-24","active_users":3},{"week_start":"2026-07-01","active_users":3},{"week_start":"2026-07-08","active_users":3},{"week_start":"2026-07-15","active_users":3}],"acc_0021":[{"week_start":"2026-04-29","active_users":17},{"week_start":"2026-05-06","active_users":16},{"week_start":"2026-05-13","active_users":14},{"week_start":"2026-05-20","active_users":13},{"week_start":"2026-05-27","active_users":14},{"week_start":"2026-06-03","active_users":13},{"week_start":"2026-06-10","active_users":11},{"week_start":"2026-06-17","active_users":10},{"week_start":"2026-06-24","active_users":8},{"week_start":"2026-07-01","active_users":8},{"week_start":"2026-07-08","active_users":7},{"week_start":"2026-07-15","active_users":5}],"acc_0022":[{"week_start":"2026-04-29","active_users":10},{"week_start":"2026-05-06","active_users":9},{"week_start":"2026-05-13","active_users":9},{"week_start":"2026-05-20","active_users":9},{"week_start":"2026-05-27","active_users":8},{"week_start":"2026-06-03","active_users":8},{"week_start":"2026-06-10","active_users":8},{"week_start":"2026-06-17","active_users":6},{"week_start":"2026-06-24","active_users":7},{"week_start":"2026-07-01","active_users":6},{"week_start":"2026-07-08","active_users":6},{"week_start":"2026-07-15","active_users":4}],"acc_0023":[{"week_start":"2026-04-29","active_users":13},{"week_start":"2026-05-06","active_users":12},{"week_start":"2026-05-13","active_users":11},{"week_start":"2026-05-20","active_users":12},{"week_start":"2026-05-27","active_users":10},{"week_start":"2026-06-03","active_users":10},{"week_start":"2026-06-10","active_users":8},{"week_start":"2026-06-17","active_users":10},{"week_start":"2026-06-24","active_users":8},{"week_start":"2026-07-01","active_users":6},{"week_start":"2026-07-08","active_users":7},{"week_start":"2026-07-15","active_users":6}],"acc_0024":[{"week_start":"2026-04-29","active_users":19},{"week_start":"2026-05-06","active_users":18},{"week_start":"2026-05-13","active_users":18},{"week_start":"2026-05-20","active_users":20},{"week_start":"2026-05-27","active_users":20},{"week_start":"2026-06-03","active_users":21},{"week_start":"2026-06-10","active_users":21},{"week_start":"2026-06-17","active_users":17},{"week_start":"2026-06-24","active_users":19},{"week_start":"2026-07-01","active_users":19},{"week_start":"2026-07-08","active_users":19},{"week_start":"2026-07-15","active_users":21}],"acc_0025":[{"week_start":"2026-04-29","active_users":14},{"week_start":"2026-05-06","active_users":14},{"week_start":"2026-05-13","active_users":15},{"week_start":"2026-05-20","active_users":14},{"week_start":"2026-05-27","active_users":14},{"week_start":"2026-06-03","active_users":14},{"week_start":"2026-06-10","active_users":14},{"week_start":"2026-06-17","active_users":14},{"week_start":"2026-06-24","active_users":15},{"week_start":"2026-07-01","active_users":13},{"week_start":"2026-07-08","active_users":14},{"week_start":"2026-07-15","active_users":15}],"acc_0026":[{"week_start":"2026-04-29","active_users":11},{"week_start":"2026-05-06","active_users":11},{"week_start":"2026-05-13","active_users":11},{"week_start":"2026-05-20","active_users":10},{"week_start":"2026-05-27","active_users":10},{"week_start":"2026-06-03","active_users":10},{"week_start":"2026-06-10","active_users":10},{"week_start":"2026-06-17","active_users":9},{"week_start":"2026-06-24","active_users":10},{"week_start":"2026-07-01","active_users":11},{"week_start":"2026-07-08","active_users":10},{"week_start":"2026-07-15","active_users":10}],"acc_0027":[{"week_start":"2026-04-29","active_users":19},{"week_start":"2026-05-06","active_users":20},{"week_start":"2026-05-13","active_users":19},{"week_start":"2026-05-20","active_users":19},{"week_start":"2026-05-27","active_users":21},{"week_start":"2026-06-03","active_users":18},{"week_start":"2026-06-10","active_users":20},{"week_start":"2026-06-17","active_users":20},{"week_start":"2026-06-24","active_users":20},{"week_start":"2026-07-01","active_users":20},{"week_start":"2026-07-08","active_users":19},{"week_start":"2026-07-15","active_users":20}],"acc_0028":[{"week_start":"2026-04-29","active_users":21},{"week_start":"2026-05-06","active_users":21},{"week_start":"2026-05-13","active_users":20},{"week_start":"2026-05-20","active_users":20},{"week_start":"2026-05-27","active_users":18},{"week_start":"2026-06-03","active_users":18},{"week_start":"2026-06-10","active_users":16},{"week_start":"2026-06-17","active_users":16},{"week_start":"2026-06-24","active_users":17},{"week_start":"2026-07-01","active_users":17},{"week_start":"2026-07-08","active_users":16},{"week_start":"2026-07-15","active_users":15}],"acc_0029":[{"week_start":"2026-04-29","active_users":4},{"week_start":"2026-05-06","active_users":4},{"week_start":"2026-05-13","active_users":4},{"week_start":"2026-05-20","active_users":4},{"week_start":"2026-05-27","active_users":4},{"week_start":"2026-06-03","active_users":4},{"week_start":"2026-06-10","active_users":4},{"week_start":"2026-06-17","active_users":3},{"week_start":"2026-06-24","active_users":4},{"week_start":"2026-07-01","active_users":4},{"week_start":"2026-07-08","active_users":3},{"week_start":"2026-07-15","active_users":4}],"acc_0030":[{"week_start":"2026-04-29","active_users":5},{"week_start":"2026-05-06","active_users":5},{"week_start":"2026-05-13","active_users":5},{"week_start":"2026-05-20","active_users":5},{"week_start":"2026-05-27","active_users":5},{"week_start":"2026-06-03","active_users":4},{"week_start":"2026-06-10","active_users":4},{"week_start":"2026-06-17","active_users":4},{"week_start":"2026-06-24","active_users":5},{"week_start":"2026-07-01","active_users":4},{"week_start":"2026-07-08","active_users":4},{"week_start":"2026-07-15","active_users":4}],"acc_0031":[{"week_start":"2026-04-29","active_users":18},{"week_start":"2026-05-06","active_users":16},{"week_start":"2026-05-13","active_users":16},{"week_start":"2026-05-20","active_users":17},{"week_start":"2026-05-27","active_users":16},{"week_start":"2026-06-03","active_users":17},{"week_start":"2026-06-10","active_users":15},{"week_start":"2026-06-17","active_users":16},{"week_start":"2026-06-24","active_users":15},{"week_start":"2026-07-01","active_users":15},{"week_start":"2026-07-08","active_users":15},{"week_start":"2026-07-15","active_users":15}],"acc_0032":[{"week_start":"2026-04-29","active_users":8},{"week_start":"2026-05-06","active_users":7},{"week_start":"2026-05-13","active_users":7},{"week_start":"2026-05-20","active_users":8},{"week_start":"2026-05-27","active_users":7},{"week_start":"2026-06-03","active_users":8},{"week_start":"2026-06-10","active_users":7},{"week_start":"2026-06-17","active_users":8},{"week_start":"2026-06-24","active_users":7},{"week_start":"2026-07-01","active_users":7},{"week_start":"2026-07-08","active_users":7},{"week_start":"2026-07-15","active_users":6}],"acc_0033":[{"week_start":"2026-04-29","active_users":17},{"week_start":"2026-05-06","active_users":16},{"week_start":"2026-05-13","active_users":15},{"week_start":"2026-05-20","active_users":14},{"week_start":"2026-05-27","active_users":13},{"week_start":"2026-06-03","active_users":11},{"week_start":"2026-06-10","active_users":10},{"week_start":"2026-06-17","active_users":10},{"week_start":"2026-06-24","active_users":9},{"week_start":"2026-07-01","active_users":7},{"week_start":"2026-07-08","active_users":9},{"week_start":"2026-07-15","active_users":6}],"acc_0034":[{"week_start":"2026-04-29","active_users":6},{"week_start":"2026-05-06","active_users":6},{"week_start":"2026-05-13","active_users":6},{"week_start":"2026-05-20","active_users":5},{"week_start":"2026-05-27","active_users":4},{"week_start":"2026-06-03","active_users":5},{"week_start":"2026-06-10","active_users":4},{"week_start":"2026-06-17","active_users":4},{"week_start":"2026-06-24","active_users":4},{"week_start":"2026-07-01","active_users":3},{"week_start":"2026-07-08","active_users":3},{"week_start":"2026-07-15","active_users":3}],"acc_0035":[{"week_start":"2026-04-29","active_users":6},{"week_start":"2026-05-06","active_users":6},{"week_start":"2026-05-13","active_users":6},{"week_start":"2026-05-20","active_users":5},{"week_start":"2026-05-27","active_users":5},{"week_start":"2026-06-03","active_users":5},{"week_start":"2026-06-10","active_users":4},{"week_start":"2026-06-17","active_users":4},{"week_start":"2026-06-24","active_users":4},{"week_start":"2026-07-01","active_users":3},{"week_start":"2026-07-08","active_users":4},{"week_start":"2026-07-15","active_users":3}],"acc_0036":[{"week_start":"2026-04-29","active_users":10},{"week_start":"2026-05-06","active_users":10},{"week_start":"2026-05-13","active_users":10},{"week_start":"2026-05-20","active_users":9},{"week_start":"2026-05-27","active_users":9},{"week_start":"2026-06-03","active_users":8},{"week_start":"2026-06-10","active_users":7},{"week_start":"2026-06-17","active_users":7},{"week_start":"2026-06-24","active_users":6},{"week_start":"2026-07-01","active_users":6},{"week_start":"2026-07-08","active_users":5},{"week_start":"2026-07-15","active_users":6}],"acc_0037":[{"week_start":"2026-04-29","active_users":16},{"week_start":"2026-05-06","active_users":14},{"week_start":"2026-05-13","active_users":13},{"week_start":"2026-05-20","active_users":13},{"week_start":"2026-05-27","active_users":11},{"week_start":"2026-06-03","active_users":11},{"week_start":"2026-06-10","active_users":10},{"week_start":"2026-06-17","active_users":10},{"week_start":"2026-06-24","active_users":10},{"week_start":"2026-07-01","active_users":8},{"week_start":"2026-07-08","active_users":7},{"week_start":"2026-07-15","active_users":8}],"acc_0038":[{"week_start":"2026-04-29","active_users":7},{"week_start":"2026-05-06","active_users":8},{"week_start":"2026-05-13","active_users":8},{"week_start":"2026-05-20","active_users":8},{"week_start":"2026-05-27","active_users":7},{"week_start":"2026-06-03","active_users":8},{"week_start":"2026-06-10","active_users":8},{"week_start":"2026-06-17","active_users":9},{"week_start":"2026-06-24","active_users":8},{"week_start":"2026-07-01","active_users":8},{"week_start":"2026-07-08","active_users":9},{"week_start":"2026-07-15","active_users":10}],"acc_0039":[{"week_start":"2026-04-29","active_users":9},{"week_start":"2026-05-06","active_users":9},{"week_start":"2026-05-13","active_users":10},{"week_start":"2026-05-20","active_users":10},{"week_start":"2026-05-27","active_users":10},{"week_start":"2026-06-03","active_users":10},{"week_start":"2026-06-10","active_users":11},{"week_start":"2026-06-17","active_users":12},{"week_start":"2026-06-24","active_users":12},{"week_start":"2026-07-01","active_users":10},{"week_start":"2026-07-08","active_users":11},{"week_start":"2026-07-15","active_users":12}],"acc_0040":[{"week_start":"2026-04-29","active_users":15},{"week_start":"2026-05-06","active_users":14},{"week_start":"2026-05-13","active_users":16},{"week_start":"2026-05-20","active_users":16},{"week_start":"2026-05-27","active_users":16},{"week_start":"2026-06-03","active_users":17},{"week_start":"2026-06-10","active_users":17},{"week_start":"2026-06-17","active_users":17},{"week_start":"2026-06-24","active_users":16},{"week_start":"2026-07-01","active_users":17},{"week_start":"2026-07-08","active_users":20},{"week_start":"2026-07-15","active_users":18}],"acc_0041":[{"week_start":"2026-04-29","active_users":41},{"week_start":"2026-05-06","active_users":40},{"week_start":"2026-05-13","active_users":39},{"week_start":"2026-05-20","active_users":35},{"week_start":"2026-05-27","active_users":31},{"week_start":"2026-06-03","active_users":27},{"week_start":"2026-06-10","active_users":23},{"week_start":"2026-06-17","active_users":20},{"week_start":"2026-06-24","active_users":17},{"week_start":"2026-07-01","active_users":14},{"week_start":"2026-07-08","active_users":12},{"week_start":"2026-07-15","active_users":11}],"acc_0042":[{"week_start":"2026-04-29","active_users":51},{"week_start":"2026-05-06","active_users":50},{"week_start":"2026-05-13","active_users":49},{"week_start":"2026-05-20","active_users":45},{"week_start":"2026-05-27","active_users":40},{"week_start":"2026-06-03","active_users":35},{"week_start":"2026-06-10","active_users":30},{"week_start":"2026-06-17","active_users":26},{"week_start":"2026-06-24","active_users":22},{"week_start":"2026-07-01","active_users":19},{"week_start":"2026-07-08","active_users":18},{"week_start":"2026-07-15","active_users":17}]},"eventCounts":{"acc_0001":{"report_export":26,"login":100,"invite_sent":6,"dashboard_view":38,"integration_connected":7,"seat_added":3},"acc_0002":{"login":94,"dashboard_view":46,"seat_added":8,"report_export":13,"integration_connected":11,"invite_sent":8},"acc_0003":{"dashboard_view":50,"login":96,"invite_sent":4,"integration_connected":11,"report_export":12,"seat_added":7},"acc_0004":{"login":94,"integration_connected":15,"dashboard_view":46,"invite_sent":5,"seat_added":5,"report_export":15},"acc_0005":{"login":86,"dashboard_view":51,"invite_sent":8,"integration_connected":5,"seat_added":8,"report_export":12},"acc_0006":{"dashboard_view":43,"login":95,"report_export":12,"seat_added":6,"invite_sent":5,"integration_connected":5},"acc_0007":{"login":90,"seat_added":6,"report_export":23,"dashboard_view":49,"integration_connected":7,"invite_sent":5},"acc_0008":{"login":96,"dashboard_view":43,"seat_added":3,"report_export":23,"integration_connected":12,"invite_sent":2},"acc_0009":{"report_export":8,"login":52,"seat_added":2,"dashboard_view":15,"integration_connected":1},"acc_0010":{"dashboard_view":42,"login":104,"report_export":21,"integration_connected":8,"invite_sent":4,"seat_added":1},"acc_0011":{"login":106,"integration_connected":8,"invite_sent":3,"dashboard_view":40,"report_export":14,"seat_added":4},"acc_0012":{"login":100,"report_export":22,"dashboard_view":32,"seat_added":7,"integration_connected":10,"invite_sent":4},"acc_0013":{"dashboard_view":29,"integration_connected":6,"login":39,"seat_added":2,"invite_sent":2,"report_export":8},"acc_0014":{"dashboard_view":43,"report_export":24,"seat_added":5,"login":93,"invite_sent":4,"integration_connected":11},"acc_0015":{"login":100,"dashboard_view":44,"report_export":17,"invite_sent":5,"integration_connected":10,"seat_added":4},"acc_0016":{"report_export":23,"login":72,"dashboard_view":28,"integration_connected":6,"invite_sent":4,"seat_added":4},"acc_0017":{"login":42,"seat_added":2,"dashboard_view":19,"report_export":12,"integration_connected":4,"invite_sent":1},"acc_0018":{"login":96,"dashboard_view":46,"report_export":15,"seat_added":2,"integration_connected":9,"invite_sent":3},"acc_0019":{"dashboard_view":39,"login":103,"seat_added":8,"report_export":18,"integration_connected":10,"invite_sent":2},"acc_0020":{"login":41,"report_export":20,"dashboard_view":34,"invite_sent":4,"integration_connected":4,"seat_added":1},"acc_0021":{"dashboard_view":52,"login":88,"report_export":16,"integration_connected":10,"seat_added":6,"invite_sent":3},"acc_0022":{"login":83,"dashboard_view":46,"report_export":7,"invite_sent":5,"integration_connected":8,"seat_added":6},"acc_0023":{"login":93,"dashboard_view":45,"report_export":19,"invite_sent":2,"integration_connected":13,"seat_added":6},"acc_0024":{"report_export":14,"login":101,"integration_connected":10,"dashboard_view":47,"seat_added":5,"invite_sent":3},"acc_0025":{"login":96,"dashboard_view":50,"report_export":16,"seat_added":6,"integration_connected":8,"invite_sent":4},"acc_0026":{"login":100,"report_export":21,"dashboard_view":41,"integration_connected":8,"invite_sent":5,"seat_added":2},"acc_0027":{"seat_added":3,"login":101,"report_export":28,"integration_connected":10,"dashboard_view":37,"invite_sent":1},"acc_0028":{"invite_sent":6,"login":99,"dashboard_view":46,"integration_connected":13,"report_export":11,"seat_added":5},"acc_0029":{"report_export":12,"integration_connected":6,"login":44,"dashboard_view":28,"invite_sent":2},"acc_0030":{"dashboard_view":32,"login":46,"integration_connected":7,"report_export":17,"invite_sent":2,"seat_added":2},"acc_0031":{"login":105,"dashboard_view":44,"report_export":17,"integration_connected":6,"seat_added":5,"invite_sent":3},"acc_0032":{"seat_added":4,"report_export":15,"login":85,"dashboard_view":48,"integration_connected":6,"invite_sent":4},"acc_0033":{"invite_sent":6,"dashboard_view":46,"report_export":18,"login":93,"integration_connected":6,"seat_added":5},"acc_0034":{"dashboard_view":26,"report_export":11,"login":72,"integration_connected":6,"invite_sent":3},"acc_0035":{"dashboard_view":34,"report_export":12,"login":59,"invite_sent":5,"seat_added":2,"integration_connected":9},"acc_0036":{"login":92,"dashboard_view":43,"integration_connected":5,"report_export":15,"invite_sent":3,"seat_added":4},"acc_0037":{"login":99,"report_export":22,"dashboard_view":42,"integration_connected":8,"invite_sent":3,"seat_added":4},"acc_0038":{"login":66,"report_export":19,"dashboard_view":41,"seat_added":13,"invite_sent":15,"integration_connected":8},"acc_0039":{"integration_connected":11,"report_export":22,"login":71,"dashboard_view":39,"seat_added":23,"invite_sent":12},"acc_0040":{"login":73,"dashboard_view":48,"seat_added":16,"report_export":24,"invite_sent":11,"integration_connected":8},"acc_0041":{"login":1,"dashboard_view":1,"report_export":1,"invite_sent":1,"integration_connected":1,"seat_added":1},"acc_0042":{"login":1,"dashboard_view":1,"report_export":1,"invite_sent":1,"integration_connected":1,"seat_added":1}}};
+const REF = DATA.reference_date;
+const REF_MS = Date.parse(REF);
+const DAY = 86400000;
+const POSITIVE = new Set(['seat_added', 'invite_sent', 'integration_connected']);
+const BUCKETS = [
+  { key: 'urgent', label: 'Urgent' },
+  { key: 'watch', label: 'Watch' },
+  { key: 'healthy', label: 'Healthy' },
+];
+
+const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+const avg = (ws) => ws.length ? ws.reduce((s, w) => s + w.active_users, 0) / ws.length : 0;
+
+// The spec.md risk formula, computed client-side against the fixed reference date.
+function computeRisk(acc, series) {
+  const risk_health = clamp((100 - acc.health_score) / 100, 0, 1);
+  let risk_usage = 0, pct = null;
+  const insufficient = series.length < 6;
+  if (!insufficient) {
+    const f = avg(series.slice(0, 3)), l = avg(series.slice(-3));
+    if (f !== 0) { pct = (l - f) / f; risk_usage = clamp(-pct / 0.5, 0, 1); }
+  }
+  const days = Math.floor((Date.parse(acc.renewal_date) - REF_MS) / DAY);
+  const risk_renewal = clamp((90 - days) / 60, 0, 1);
+  const combined = 0.4 * risk_health + 0.4 * risk_usage + 0.2 * risk_renewal;
+  const bucket = (combined >= 0.6 && risk_renewal >= 0.5) ? 'urgent' : (combined >= 0.4 ? 'watch' : 'healthy');
+  return { bucket, combined, risk_renewal, days, insufficient, pct };
+}
+
+function reasonText(acc, r) {
+  const parts = ['health ' + acc.health_score];
+  if (r.insufficient) parts.push('usage trend unavailable (fewer than 6 weeks)');
+  else if (r.pct !== null) {
+    const p = Math.round(Math.abs(r.pct) * 100);
+    parts.push(r.pct < 0 ? 'active users down ' + p + '% over the tracked weeks' : 'active users up ' + p + '% over the tracked weeks');
+  }
+  parts.push(r.days < 0 ? 'renewed ' + Math.abs(r.days) + ' days ago' : 'renews in ' + r.days + ' days');
+  return parts.join(', ');
+}
+
+function money(n) { return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
+function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+function sparkline(series) {
+  const vals = series.map((w) => w.active_users);
+  if (!vals.length) return '<span class="spark-cap">no usage history</span>';
+  const w = 132, h = 34, pad = 3;
+  const max = Math.max(...vals), min = Math.min(...vals), span = (max - min) || 1;
+  const x = (i) => pad + (i * (w - 2 * pad)) / (vals.length - 1 || 1);
+  const y = (v) => pad + (h - 2 * pad) * (1 - (v - min) / span);
+  const pts = vals.map((v, i) => x(i).toFixed(1) + ',' + y(v).toFixed(1));
+  const area = 'M' + pts.join(' L') + ' L' + x(vals.length - 1).toFixed(1) + ',' + (h - pad) + ' L' + x(0).toFixed(1) + ',' + (h - pad) + ' Z';
+  const ex = x(vals.length - 1).toFixed(1), ey = y(vals[vals.length - 1]).toFixed(1);
+  return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true">' +
+    '<path d="' + area + '" fill="var(--accent)" opacity="0.12" />' +
+    '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var(--spark)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />' +
+    '<circle cx="' + ex + '" cy="' + ey + '" r="2.6" fill="var(--accent)" />' +
+    '</svg>';
+}
+
+function eventChips(id) {
+  const counts = DATA.eventCounts[id] || {};
+  const types = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  if (!types.length) return '<span class="spark-cap">no recent events</span>';
+  return '<div class="chips">' + types.map((t) =>
+    '<span class="chip ' + (POSITIVE.has(t) ? 'pos' : '') + '">' + esc(t) + ' <span class="n">' + counts[t] + '</span></span>'
+  ).join('') + '</div>';
+}
+
+// Pre-score every account once.
+const SCORED = DATA.accounts.map((acc) => {
+  const series = DATA.usage[acc.id] || [];
+  const r = computeRisk(acc, series);
+  return { ...acc, ...r, series, reason: reasonText(acc, r) };
+});
+
+const els = {
+  board: document.getElementById('board'), kpis: document.getElementById('kpis'),
+  search: document.getElementById('f-search'), plan: document.getElementById('f-plan'),
+  window: document.getElementById('f-window'), sort: document.getElementById('f-sort'),
+  note: document.getElementById('count-note'), asof: document.getElementById('asof-date'),
+};
+els.asof.textContent = REF;
+
+function renderKpis() {
+  const by = { urgent: [], watch: [], healthy: [] };
+  SCORED.forEach((a) => by[a.bucket].push(a));
+  const atRisk = [...by.urgent, ...by.watch].reduce((s, a) => s + a.mrr, 0);
+  const tiles = [
+    { lab: 'Urgent', cls: 'urgent', num: by.urgent.length, foot: 'call this week' },
+    { lab: 'Watch', cls: 'watch', num: by.watch.length, foot: 'monitor' },
+    { lab: 'Healthy', cls: 'healthy', num: by.healthy.length, foot: 'no action' },
+    { lab: 'MRR at risk', cls: 'accent', num: '$' + Math.round(atRisk).toLocaleString('en-US'), foot: 'urgent + watch' },
+  ];
+  els.kpis.innerHTML = tiles.map((t) =>
+    '<div class="kpi"><div class="lab"><span class="dot ' + t.cls + '"></span>' + t.lab + '</div>' +
+    '<div class="num">' + t.num + '</div><div class="foot">' + t.foot + '</div></div>'
+  ).join('');
+}
+
+function passes(a) {
+  const q = els.search.value.trim().toLowerCase();
+  if (q && !a.name.toLowerCase().includes(q)) return false;
+  if (els.plan.value && a.plan !== els.plan.value) return false;
+  if (els.window.value) { const d = Number(els.window.value); if (!(a.days >= 0 && a.days <= d)) return false; }
+  return true;
+}
+function sortList(list) {
+  const s = els.sort.value;
+  return list.slice().sort((a, b) =>
+    s === 'mrr' ? b.mrr - a.mrr : s === 'renewal' ? a.days - b.days : s === 'name' ? a.name.localeCompare(b.name) : b.combined - a.combined);
+}
+
+function cardHtml(a) {
+  const renewal = a.days < 0 ? 'renewed ' + Math.abs(a.days) + 'd ago' : 'renews in ' + a.days + 'd';
+  const flag = a.insufficient ? '<span class="flag">insufficient usage history</span>' : '';
+  return '<article class="card" data-id="' + a.id + '">' +
+    '<button class="card-top" aria-expanded="false">' +
+      '<span class="name">' + esc(a.name) + '<span class="plan">' + esc(a.plan) + '</span></span>' +
+      '<span class="meta">' + money(a.mrr) + ' &middot; ' + renewal + '</span>' +
+      '<span class="reason">' + esc(a.reason) + flag + ' <span class="chev">&rsaquo;</span></span>' +
+    '</button>' +
+    '<div class="detail"><div class="detail-inner"><div class="detail-pad">' +
+      '<div class="spark-wrap"><span class="spark-cap">weekly active users</span>' + sparkline(a.series) + '</div>' +
+      eventChips(a.id) +
+    '</div></div></div></article>';
+}
+
+function render() {
+  const shown = SCORED.filter(passes);
+  els.note.textContent = shown.length + ' of ' + SCORED.length + ' accounts';
+  els.board.innerHTML = BUCKETS.map(({ key, label }) => {
+    const list = sortList(shown.filter((a) => a.bucket === key));
+    const body = list.length ? '<div class="cards">' + list.map(cardHtml).join('') + '</div>'
+      : '<div class="empty">No accounts in this bucket for the current filters.</div>';
+    return '<section class="bucket b-' + key + '"><div class="bucket-head"><h2>' + label + '</h2>' +
+      '<span class="pill">' + list.length + '</span><span class="rail"></span></div>' + body + '</section>';
+  }).join('');
+  els.board.querySelectorAll('.card-top').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.card');
+      const open = card.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+}
+
+[els.search, els.plan, els.window, els.sort].forEach((el) => el.addEventListener('input', render));
+renderKpis();
+render();
+</script>
+
+
+</body>
+</html>
