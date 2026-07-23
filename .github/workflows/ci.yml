@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Real pass/fail gates:
+      - name: Product test suite (node --test)
+        run: npm test
+      - name: Harness lint (no acc_ literals / checksums intact / mock hooks present)
+        run: node harness/lint.js
+
+      # Informational diagnostics — these exit 0 in normal operation, but will
+      # fail the run if the harness reports a VOID (tampering) or an error:
+      - name: Dev risk-bucket score
+        run: node harness/score.js
+      - name: Probe — memorization gauge (probe-vs-dev parity)
+        run: node harness/probe.js

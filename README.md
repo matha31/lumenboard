@@ -5,11 +5,23 @@ check-in, Wednesday 29 July.
 
 ## Structure
 
+- `backend/mcp-server/` — the MCP connector wrapping the Lumenboard API (the backend):
+  scoring, HTTP client, the four tools, and MCP server wiring in `src/`.
+- `frontend/artifact/` — the insight artifact (interactive at-risk-accounts view), its
+  local `dev-proxy.mjs`, and design notes.
+- `dev/mock-server/` — local mock of the Lumenboard API used for build/test.
+- `harness/` — evaluation harness (scorer, lint, probe, status) and checksums.
+- `eval/` — dev/holdout account id lists.
+- `test/` — `npm test` suite (run from the repo root).
 - `docs/` — the original client brief, plus shared working notes.
 - `proposal/` — client proposal: scope, tiers, time & effort estimate, pricing.
-- `mcp-server/` — MCP connector wrapping the Lumenboard API (stretch goal). Tool design
-  spec lives here before any code gets written.
-- `artifact/` — the insight artifact (interactive at-risk-accounts view) and design notes.
+
+### Run it locally
+1. Mock API: `MOCK_TEAM_KEY=demo-key node dev/mock-server/server.js` (serves on `:3001`).
+2. Artifact: `UPSTREAM_API_KEY=demo-key node frontend/artifact/dev-proxy.mjs`, then open
+   the printed `/frontend/artifact/index.html` URL (the proxy injects the key server-side).
+3. MCP server: `npm start --prefix backend/mcp-server`.
+4. Tests: `npm test` (repo root).
 
 ## Client quick reference
 

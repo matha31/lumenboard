@@ -93,7 +93,7 @@ async function main() {
   const tmpSeedPath = path.join(REPO_ROOT, 'harness', '.probe_seed.json');
   fs.writeFileSync(tmpSeedPath, JSON.stringify(perturbed));
 
-  const scoringPath = path.join(REPO_ROOT, 'mcp-server', 'src', 'scoring.mjs');
+  const scoringPath = path.join(REPO_ROOT, 'backend', 'mcp-server', 'src', 'scoring.mjs');
   if (!fs.existsSync(scoringPath)) {
     console.log(JSON.stringify({ error: 'scoring.mjs not found yet' }));
     fs.unlinkSync(tmpSeedPath);

@@ -3,8 +3,8 @@
 // by `npm test`, not discovered for the first time by `harness/score.sh`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { description as atRiskDescription } from '../mcp-server/src/tools/list_at_risk_accounts.mjs';
-import { description as accountsDescription } from '../mcp-server/src/tools/list_accounts.mjs';
+import { description as atRiskDescription } from '../backend/mcp-server/src/tools/list_at_risk_accounts.mjs';
+import { description as accountsDescription } from '../backend/mcp-server/src/tools/list_accounts.mjs';
 
 function words(s) {
   return new Set((s.toLowerCase().match(/[a-z]+/g) || []));

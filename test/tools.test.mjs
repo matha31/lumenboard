@@ -2,10 +2,10 @@ import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { startMockServer } from './helpers/mock-server.mjs';
 
-import { listAccounts } from '../mcp-server/src/tools/list_accounts.mjs';
-import { getAccountUsage } from '../mcp-server/src/tools/get_account_usage.mjs';
-import { listAtRiskAccounts } from '../mcp-server/src/tools/list_at_risk_accounts.mjs';
-import { listRecentEvents } from '../mcp-server/src/tools/list_recent_events.mjs';
+import { listAccounts } from '../backend/mcp-server/src/tools/list_accounts.mjs';
+import { getAccountUsage } from '../backend/mcp-server/src/tools/get_account_usage.mjs';
+import { listAtRiskAccounts } from '../backend/mcp-server/src/tools/list_at_risk_accounts.mjs';
+import { listRecentEvents } from '../backend/mcp-server/src/tools/list_recent_events.mjs';
 
 describe('tool layer — behavior table (docs/Scenario-3-Lumenboard-Guide.md)', () => {
   let server;

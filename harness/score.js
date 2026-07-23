@@ -65,9 +65,9 @@ function confusion(pred, actual, target) {
 }
 
 async function scoreAgainstAnswers(answersObj, referenceDate, baseUrl) {
-  const scoringPath = path.join(REPO_ROOT, 'mcp-server', 'src', 'scoring.mjs');
+  const scoringPath = path.join(REPO_ROOT, 'backend', 'mcp-server', 'src', 'scoring.mjs');
   if (!fs.existsSync(scoringPath)) {
-    return { error: `mcp-server/src/scoring.mjs not found — Stage 0 (spec.md) is not built yet.` };
+    return { error: `backend/mcp-server/src/scoring.mjs not found — Stage 0 (spec.md) is not built yet.` };
   }
   let mod;
   try { mod = await import(pathToFileURL(scoringPath).href + `?t=${Date.now()}`); }
@@ -94,7 +94,7 @@ async function scoreAgainstAnswers(answersObj, referenceDate, baseUrl) {
 }
 
 function checkToolDifferentiation() {
-  const toolsDir = path.join(REPO_ROOT, 'mcp-server', 'src', 'tools');
+  const toolsDir = path.join(REPO_ROOT, 'backend', 'mcp-server', 'src', 'tools');
   const listAtRisk = path.join(toolsDir, 'list_at_risk_accounts.mjs');
   const listAccounts = path.join(toolsDir, 'list_accounts.mjs');
   if (!fs.existsSync(listAtRisk) || !fs.existsSync(listAccounts)) {

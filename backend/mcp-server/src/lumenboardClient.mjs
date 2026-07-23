@@ -1,4 +1,4 @@
-// mcp-server/src/lumenboardClient.mjs — thin HTTP wrapper around the
+// backend/mcp-server/src/lumenboardClient.mjs — thin HTTP wrapper around the
 // Lumenboard API (real or mock; both speak the same OpenAPI shape).
 // Base URL/key are read from the environment on every call (not cached at
 // import time) so callers — and tests — can point at different servers by

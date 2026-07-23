@@ -1,4 +1,4 @@
-// mcp-server/src/errors.mjs — maps callLumenboard's { ok:false, status, error }
+// backend/mcp-server/src/errors.mjs — maps callLumenboard's { ok:false, status, error }
 // into the human-readable, never-a-stack-trace message tools return, per the
 // behavior table in docs/Scenario-3-Lumenboard-Guide.md.
 

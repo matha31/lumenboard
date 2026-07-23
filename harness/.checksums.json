@@ -1,7 +1,7 @@
 {
-  "harness/score.js": "4556c83e7b163038188581b04040de5423b4d9f12fbfc2350c845dea95588f01",
-  "harness/lint.js": "7423697616ef6aafb3062186048b97055fa162397c28f9b9ac6a0af133645fec",
-  "harness/probe.js": "4f44d018ee423c255d6319e864d2e4f0b5f5c60be5ff9eaafdf243881a048bfc",
+  "harness/score.js": "341106ad812b96173ff5a91dcf3c04ca563e0960b8cd8d1bccff7e4e2e1e0ae0",
+  "harness/lint.js": "39a6c9b91f2fc8773bb746037e5afe6e10c88af92aff5a25ba1f187cee5e03d6",
+  "harness/probe.js": "b0109040cfafda95120964644132c32666b568c47f542c05e8c1930fd462ec76",
   "harness/status.js": "589068dbeb0cbf0c71d5d99fffee6a547c86480cffb8a7d1d7f9c38166a67402",
   "harness/score.sh": "a9f883f8ad36ae51a6d9ac184860c6a6f080f7e8e69652cfc5a31350ba095482",
   "harness/lint.sh": "cedc55131e9dedd30f0e76b7338d6d4807202076da7a34583bab172035e6cd16",

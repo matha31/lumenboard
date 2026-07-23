@@ -1,4 +1,4 @@
-// mcp-server/src/tools/list_at_risk_accounts.mjs — the triage tool: pushes
+// backend/mcp-server/src/tools/list_at_risk_accounts.mjs — the triage tool: pushes
 // risk computation into the tool layer so callers get a ranked, reasoned
 // list, not a raw dump to re-derive risk from themselves.
 import { callLumenboard } from '../lumenboardClient.mjs';
@@ -6,6 +6,7 @@ import { computeRisk } from '../scoring.mjs';
 import { buildRiskReason } from '../reason.mjs';
 import { mapApiError } from '../errors.mjs';
 import { validateAccountsResponse, validateUsageResponse } from '../schemas.mjs';
+import { sanitizeApiText } from '../sanitize.mjs';
 
 export const description =
   'Ranks every account by churn exposure, combining health score, usage-decline trend, and renewal proximity into one score with an urgent, watch, or healthy bucket and a plain-English reason per account. Use this to triage which customers need attention this week.';
@@ -44,7 +45,7 @@ export async function listAtRiskAccounts(input = {}) {
       series = usageRes.data.series || [];
     }
     const risk = computeRisk(account, series, referenceDate);
-    scored.push({ ...account, ...risk, reason: buildRiskReason(account, risk) });
+    scored.push({ ...account, name: sanitizeApiText(account.name), ...risk, reason: buildRiskReason(account, risk) });
   }
 
   let filtered = scored;

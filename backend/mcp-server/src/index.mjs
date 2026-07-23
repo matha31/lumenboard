@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// mcp-server/src/index.mjs — MCP wiring. Thin: every tool handler here just
-// calls the same function the harness tests directly (see mcp-server/src/tools/),
+// backend/mcp-server/src/index.mjs — MCP wiring. Thin: every tool handler here just
+// calls the same function the harness tests directly (see backend/mcp-server/src/tools/),
 // so a bug in this file cannot inflate the score without also being visible
 // in a real Claude session.
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';

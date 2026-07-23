@@ -1,7 +1,7 @@
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { callLumenboard, checkHealth } from '../mcp-server/src/lumenboardClient.mjs';
+import { callLumenboard, checkHealth } from '../backend/mcp-server/src/lumenboardClient.mjs';
 import { startMockServer } from './helpers/mock-server.mjs';
 
 describe('callLumenboard', () => {

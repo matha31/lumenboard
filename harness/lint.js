@@ -25,7 +25,7 @@ function walk(dir, exts, exclude) {
 }
 
 function checkAccountIdLiterals() {
-  const dirs = [path.join(REPO_ROOT, 'mcp-server'), path.join(REPO_ROOT, 'artifact')];
+  const dirs = [path.join(REPO_ROOT, 'backend', 'mcp-server'), path.join(REPO_ROOT, 'frontend', 'artifact')];
   const idPattern = /acc_\d{4}/g;
   const findings = [];
   for (const dir of dirs) {
