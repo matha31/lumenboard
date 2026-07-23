@@ -1,4 +1,4 @@
-// mcp-server/src/scoring.mjs — the risk formula, per spec.md section 1.
+// backend/mcp-server/src/scoring.mjs — the risk formula, per spec.md section 1.
 // NEVER read the system clock in here; referenceDate is always caller-supplied
 // so scoring stays deterministic and testable.
 

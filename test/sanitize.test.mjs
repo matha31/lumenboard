@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { sanitizeApiText } from '../mcp-server/src/sanitize.mjs';
+import { sanitizeApiText } from '../backend/mcp-server/src/sanitize.mjs';
 
 describe('sanitizeApiText — free-text as data, not instructions (proposal §03)', () => {
   test('leaves a legitimate name untouched', () => {

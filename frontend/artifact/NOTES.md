@@ -18,7 +18,7 @@ configurable API *base* is stored. On load, the artifact runs a `GET /health`
 preflight before firing any tool, so a misconfigured base or a missing/rejected
 server-side key surfaces as a clear banner instead of empty cards.
 
-Run locally: `UPSTREAM_API_KEY=<team key> UPSTREAM_API_BASE=http://localhost:3001 node artifact/dev-proxy.mjs`
+Run locally: `UPSTREAM_API_KEY=<team key> UPSTREAM_API_BASE=http://localhost:3001 node frontend/artifact/dev-proxy.mjs`
 (start the mock separately), then open the printed URL.
 
 See ../docs/NOTES.md for the fuller rationale.

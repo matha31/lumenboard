@@ -6,7 +6,7 @@ import {
   validateUsersPage,
   validateEventsResponse,
   isValidAccountId,
-} from '../mcp-server/src/schemas.mjs';
+} from '../backend/mcp-server/src/schemas.mjs';
 
 // Proposal §03 "Output Validation": responses are schema-checked before use, so
 // a drifted/corrupt API shape is refused rather than silently mis-scored.

@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { computeRisk } from '../mcp-server/src/scoring.mjs';
+import { computeRisk } from '../backend/mcp-server/src/scoring.mjs';
 
 const REFERENCE_DATE = '2026-07-22';
 

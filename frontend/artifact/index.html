@@ -180,10 +180,10 @@
 </main>
 
 <script type="module">
-import { listAtRiskAccounts } from '../mcp-server/src/tools/list_at_risk_accounts.mjs';
-import { listRecentEvents } from '../mcp-server/src/tools/list_recent_events.mjs';
-import { getAccountUsage } from '../mcp-server/src/tools/get_account_usage.mjs';
-import { checkHealth } from '../mcp-server/src/lumenboardClient.mjs';
+import { listAtRiskAccounts } from '../../backend/mcp-server/src/tools/list_at_risk_accounts.mjs';
+import { listRecentEvents } from '../../backend/mcp-server/src/tools/list_recent_events.mjs';
+import { getAccountUsage } from '../../backend/mcp-server/src/tools/get_account_usage.mjs';
+import { checkHealth } from '../../backend/mcp-server/src/lumenboardClient.mjs';
 
 const STORAGE_KEY = 'lumenboard.artifact.settings.v1';
 const POSITIVE_EVENT_TYPES = new Set(['seat_added', 'invite_sent', 'integration_connected']);

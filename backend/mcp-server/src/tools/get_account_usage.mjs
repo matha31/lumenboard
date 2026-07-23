@@ -1,4 +1,4 @@
-// mcp-server/src/tools/get_account_usage.mjs — weekly usage trend for one
+// backend/mcp-server/src/tools/get_account_usage.mjs — weekly usage trend for one
 // account, for sparkline/drill-down rendering.
 import { callLumenboard } from '../lumenboardClient.mjs';
 import { mapApiError } from '../errors.mjs';

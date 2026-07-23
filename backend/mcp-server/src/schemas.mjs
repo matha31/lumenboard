@@ -1,4 +1,4 @@
-// mcp-server/src/schemas.mjs — lightweight, dependency-free response-shape
+// backend/mcp-server/src/schemas.mjs — lightweight, dependency-free response-shape
 // checks. Proposal §03 "Output Validation": API responses are schema-checked
 // before being handed back to Claude or rendered in the artifact, so an
 // unexpected shape can't silently corrupt the risk ranking. Hand-rolled (no

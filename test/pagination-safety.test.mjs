@@ -1,8 +1,8 @@
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { listRecentEvents } from '../mcp-server/src/tools/list_recent_events.mjs';
-import { listAccounts } from '../mcp-server/src/tools/list_accounts.mjs';
+import { listRecentEvents } from '../backend/mcp-server/src/tools/list_recent_events.mjs';
+import { listAccounts } from '../backend/mcp-server/src/tools/list_accounts.mjs';
 
 // Review hardening: a misbehaving API that paginates endlessly (or returns a
 // non-advancing cursor) must not hang the tool. These stand up deliberately

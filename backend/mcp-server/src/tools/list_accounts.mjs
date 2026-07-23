@@ -1,4 +1,4 @@
-// mcp-server/src/tools/list_accounts.mjs — raw account directory, no scoring.
+// backend/mcp-server/src/tools/list_accounts.mjs — raw account directory, no scoring.
 // Distinct on purpose from list_at_risk_accounts: this is for browsing/lookup,
 // not for triage.
 import { callLumenboard } from '../lumenboardClient.mjs';

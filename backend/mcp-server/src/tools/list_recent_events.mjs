@@ -1,4 +1,4 @@
-// mcp-server/src/tools/list_recent_events.mjs — recent event stream, cursor
+// backend/mcp-server/src/tools/list_recent_events.mjs — recent event stream, cursor
 // walked internally, optionally filtered to one account, plus a type-mix
 // summary so callers don't have to tally a raw stream themselves.
 import { callLumenboard } from '../lumenboardClient.mjs';

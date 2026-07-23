@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // artifact/dev-proxy.mjs — local-only dev helper, NOT part of the scored
 // build. Serves this repo as static files (so the artifact's ES module
-// imports of ../mcp-server/src/*.mjs resolve over http, which browsers
+// imports of ../../backend/mcp-server/src/*.mjs resolve over http, which browsers
 // require for `type="module"` — file:// is blocked) and proxies /api/* to
 // the Lumenboard mock (or real API) same-origin, so the artifact's own
 // fetch calls never hit a cross-origin CORS wall in local testing.
 //
-// Usage: node artifact/dev-proxy.mjs
+// Usage: node frontend/artifact/dev-proxy.mjs
 // Env:   DEV_PROXY_PORT (default 8090), UPSTREAM_API_BASE (default
 //        http://localhost:3001, i.e. the mock started separately).
 'use strict';
@@ -16,7 +16,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '..');
+// frontend/artifact/ -> repo root is two levels up.
+const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const PORT = Number(process.env.DEV_PROXY_PORT || 8090);
 const UPSTREAM = process.env.UPSTREAM_API_BASE || 'http://localhost:3001';
 // The team API key lives here (server-side) only — set UPSTREAM_API_KEY (or
@@ -54,7 +55,7 @@ async function proxyApi(req, res, subPath) {
 }
 
 function serveStatic(req, res, pathname) {
-  const rel = pathname === '/' ? '/artifact/index.html' : pathname;
+  const rel = pathname === '/' ? '/frontend/artifact/index.html' : pathname;
   const full = path.join(REPO_ROOT, rel);
   if (!full.startsWith(REPO_ROOT)) {
     res.writeHead(403);
@@ -80,6 +81,6 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Lumenboard artifact dev server: http://localhost:${PORT}/artifact/index.html`);
+  console.log(`Lumenboard artifact dev server: http://localhost:${PORT}/frontend/artifact/index.html`);
   console.log(`Proxying /api/* -> ${UPSTREAM} (server-side key injection: ${UPSTREAM_KEY ? 'on' : 'OFF — set UPSTREAM_API_KEY'})`);
 });

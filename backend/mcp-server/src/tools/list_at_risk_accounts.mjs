@@ -1,4 +1,4 @@
-// mcp-server/src/tools/list_at_risk_accounts.mjs — the triage tool: pushes
+// backend/mcp-server/src/tools/list_at_risk_accounts.mjs — the triage tool: pushes
 // risk computation into the tool layer so callers get a ranked, reasoned
 // list, not a raw dump to re-derive risk from themselves.
 import { callLumenboard } from '../lumenboardClient.mjs';

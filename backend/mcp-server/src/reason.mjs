@@ -1,5 +1,5 @@
-// mcp-server/src/reason.mjs — one-line human reason string from a computeRisk
-// result. Shared by list_at_risk_accounts.mjs and artifact/index.html so the
+// backend/mcp-server/src/reason.mjs — one-line human reason string from a computeRisk
+// result. Shared by list_at_risk_accounts.mjs and frontend/artifact/index.html so the
 // wording never drifts between the tool and the rendered view.
 export function buildRiskReason(account, risk) {
   const parts = [`health ${account.health_score}`];

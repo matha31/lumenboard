@@ -1,4 +1,4 @@
-// mcp-server/src/sanitize.mjs — neutralize free-text fields the API returns
+// backend/mcp-server/src/sanitize.mjs — neutralize free-text fields the API returns
 // (account names, event metadata) before they reach the model or the rendered
 // artifact. Proposal §03: "returned content is treated as data, not
 // instructions — the tool layer doesn't let it redirect what the model does
