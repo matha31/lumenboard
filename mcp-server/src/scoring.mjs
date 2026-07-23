@@ -15,7 +15,10 @@ export function computeRisk(account, usageSeries, referenceDate) {
   const { health_score, renewal_date } = account;
   const series = usageSeries || [];
 
-  const risk_health = (100 - health_score) / 100;
+  // Clamped defensively: for the documented 0-100 health_score domain this is a
+  // no-op, but a malformed out-of-range score can't push combined_risk outside
+  // [0,1] (risk_usage and risk_renewal are already clamped).
+  const risk_health = clamp((100 - health_score) / 100, 0, 1);
 
   let risk_usage = 0;
   let usage_pct_change = null;

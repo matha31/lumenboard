@@ -4,6 +4,7 @@
 import { callLumenboard } from '../lumenboardClient.mjs';
 import { mapApiError } from '../errors.mjs';
 import { isValidAccountId, validateEventsResponse } from '../schemas.mjs';
+import { sanitizeApiText } from '../sanitize.mjs';
 
 // Safety valve for cursor walking: a misbehaving/malicious API that returns an
 // endless or non-advancing cursor must not hang the tool forever (proposal §03,
@@ -61,6 +62,10 @@ export async function listRecentEvents(input = {}) {
   let events = account_id ? all.filter((e) => e.account_id === account_id) : all;
   events.sort((a, b) => Date.parse(b.occurred_at) - Date.parse(a.occurred_at));
   if (limit) events = events.slice(0, limit);
+
+  // Neutralize the free-text event `type` (API metadata) before it reaches the
+  // model — data, not instructions (proposal §03).
+  events = events.map((ev) => ({ ...ev, type: sanitizeApiText(ev.type, 64) }));
 
   const event_counts = {};
   for (const ev of events) event_counts[ev.type] = (event_counts[ev.type] || 0) + 1;

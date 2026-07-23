@@ -4,6 +4,7 @@
 import { callLumenboard } from '../lumenboardClient.mjs';
 import { mapApiError } from '../errors.mjs';
 import { validateAccountsResponse, validateUsersPage } from '../schemas.mjs';
+import { sanitizeApiText } from '../sanitize.mjs';
 
 export const description =
   'Plain directory of every account (name, plan, seats, MRR, health score, and renewal date) for browsing or looking up one specific customer by name. Returns everything unfiltered and unsorted; nothing here is prioritized.';
@@ -41,8 +42,13 @@ export async function listAccounts(input = {}) {
   if (usersRes.overflow) {
     return { ok: false, message: 'Stopped reading the user directory: /users kept reporting more pages past the safe limit — the API may be paginating endlessly.' };
   }
+
+  // If /users errored we still return the account rows (they're the primary
+  // data), but user_count is reported as null with a warning rather than a
+  // fabricated 0 — a partial failure is surfaced, not silently swallowed.
+  const usersAvailable = usersRes.ok;
   const userCounts = new Map();
-  if (usersRes.ok) {
+  if (usersAvailable) {
     for (const u of usersRes.users) {
       userCounts.set(u.account_id, (userCounts.get(u.account_id) || 0) + 1);
     }
@@ -50,8 +56,13 @@ export async function listAccounts(input = {}) {
 
   const data = accRes.data.data.map((account) => ({
     ...account,
-    user_count: userCounts.get(account.id) || 0,
+    name: sanitizeApiText(account.name),
+    user_count: usersAvailable ? (userCounts.get(account.id) || 0) : null,
   }));
 
-  return { ok: true, data };
+  const result = { ok: true, data };
+  if (!usersAvailable) {
+    result.warning = 'User counts are unavailable — the /users endpoint could not be read; account rows are otherwise complete.';
+  }
+  return result;
 }
