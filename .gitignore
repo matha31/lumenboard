@@ -8,3 +8,7 @@ harness/.started_at
 harness/.score_history.jsonl
 harness/.lint_findings.json
 harness/.probe_seed.json
+
+# Any local env file, whatever extension Notepad gives it — a real team key
+# lives here and must never reach a commit.
+.env*

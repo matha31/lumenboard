@@ -20,15 +20,24 @@ check-in, Wednesday 29 July.
 - `docs/` — the original client brief, plus shared working notes.
 - `proposal/` — client proposal: scope, tiers, time & effort estimate, pricing.
 
+### Presenting it
+
+- **Deck:** open `presentation/lumenboard-client-deck.html` in any browser — double-click
+  is fine, no server needed. Arrow keys, the nav dots, mouse wheel or swipe to move
+  between the 13 slides. Keep `presentation/assets/` beside the HTML (slide 6 embeds
+  `assets/artifact.png`). Webfonts come from Google Fonts, so the deck wants network
+  access; without it the layout holds but falls back to system serif/sans.
+- **Live artifact:** `npm run demo` starts the mock API and the artifact's dev-proxy
+  together and prints the URL. Ctrl-C stops both.
+
 ### Run it locally
-1. Mock API: `MOCK_TEAM_KEY=demo-key node dev/mock-server/server.js` (serves on `:3001`).
-2. Artifact: `UPSTREAM_API_KEY=demo-key node frontend/artifact/dev-proxy.mjs`, then open
-   the printed `/frontend/artifact/index.html` URL (the proxy injects the key server-side).
+1. Everything the demo needs, in one command: `npm run demo`.
+2. Or start the pieces yourself — mock API:
+   `MOCK_TEAM_KEY=demo-key node dev/mock-server/server.js` (serves on `:3001`); then
+   artifact: `UPSTREAM_API_KEY=demo-key node frontend/artifact/dev-proxy.mjs` and open the
+   printed `/frontend/artifact/index.html` URL (the proxy injects the key server-side).
 3. MCP server: `npm start --prefix backend/mcp-server`.
 4. Tests: `npm test` (repo root).
-5. Presentation: `presentation/lumenboard-client-deck.html` — serve it over http
-   rather than opening the file directly, so the webfonts and
-   `presentation/assets/artifact.png` both load.
 
 ### Request throttling
 
