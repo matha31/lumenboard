@@ -15,6 +15,113 @@ function envDefault(name) {
   return undefined;
 }
 
+/* ── Client-side throttle (proposal §03, "Resilience") ────────────────────────
+   Backoff on 429 is the *reactive* half: it only helps once the API has already
+   refused us. This is the proactive half — it bounds how many requests are in
+   flight and how closely together they start, so a full risk digest (one
+   /accounts read plus one /usage read per account) paces itself instead of
+   arriving as a burst. Every request goes through here, including retries.
+
+   Defaults are deliberately mild: enough to smooth a digest, not enough to make
+   an interactive artifact feel slow. Override with LUMENBOARD_MAX_CONCURRENCY /
+   LUMENBOARD_MIN_INTERVAL_MS, or call configureThrottle() directly.
+   ────────────────────────────────────────────────────────────────────────── */
+
+const DEFAULT_MAX_CONCURRENCY = 4;
+const DEFAULT_MIN_INTERVAL_MS = 25;
+
+function envNumber(name, fallback) {
+  const raw = envDefault(name);
+  if (raw === undefined) return fallback;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
+}
+
+let throttle = null;
+function throttleConfig() {
+  if (!throttle) {
+    throttle = {
+      maxConcurrency: Math.max(1, Math.floor(envNumber('LUMENBOARD_MAX_CONCURRENCY', DEFAULT_MAX_CONCURRENCY))),
+      minIntervalMs: envNumber('LUMENBOARD_MIN_INTERVAL_MS', DEFAULT_MIN_INTERVAL_MS),
+    };
+  }
+  return throttle;
+}
+
+// Test/host hook: set either knob to 0/1 to effectively disable pacing.
+// Returns the resolved config so callers can assert on it.
+export function configureThrottle(next = {}) {
+  const current = throttleConfig();
+  throttle = {
+    maxConcurrency: next.maxConcurrency === undefined
+      ? current.maxConcurrency
+      : Math.max(1, Math.floor(next.maxConcurrency)),
+    minIntervalMs: next.minIntervalMs === undefined
+      ? current.minIntervalMs
+      : Math.max(0, next.minIntervalMs),
+  };
+  return { ...throttle };
+}
+
+export function getThrottleState() {
+  return { ...throttleConfig(), inFlight, queued: waiting.length, peakInFlight };
+}
+
+// Test hook: peak concurrency is only meaningful relative to a known start.
+export function resetThrottleStats() {
+  peakInFlight = 0;
+}
+
+let inFlight = 0;
+let peakInFlight = 0;
+let lastStartMs = 0;
+let timerScheduled = false;
+const waiting = [];
+
+function pump() {
+  const { maxConcurrency, minIntervalMs } = throttleConfig();
+  while (waiting.length > 0 && inFlight < maxConcurrency) {
+    const now = Date.now();
+    const earliest = lastStartMs + minIntervalMs;
+    if (minIntervalMs > 0 && now < earliest) {
+      // Too soon for the next start — wake up exactly when it's allowed.
+      if (!timerScheduled) {
+        timerScheduled = true;
+        setTimeout(() => {
+          timerScheduled = false;
+          pump();
+        }, earliest - now);
+      }
+      return;
+    }
+    const start = waiting.shift();
+    inFlight += 1;
+    if (inFlight > peakInFlight) peakInFlight = inFlight;
+    lastStartMs = Date.now();
+    start();
+  }
+}
+
+// Runs `fn` once the throttle allows it. Rejections propagate untouched — the
+// throttle must never convert a network failure into something else.
+function schedule(fn) {
+  return new Promise((resolve, reject) => {
+    waiting.push(() => {
+      let settled;
+      try {
+        settled = Promise.resolve(fn());
+      } catch (e) {
+        settled = Promise.reject(e);
+      }
+      settled.then(resolve, reject).then(() => {
+        inFlight -= 1;
+        pump();
+      });
+    });
+    pump();
+  });
+}
+
 // `base` may be a bare origin (`http://host`), an absolute base that carries a
 // path prefix (`http://host/api`), or a same-origin relative prefix (`/api`, as
 // the artifact uses behind its dev-proxy). Join it to `path` as a prefix and
@@ -27,7 +134,13 @@ function buildRequestUrl(path, base) {
   return new URL(String(base).replace(/\/+$/, '') + path, origin);
 }
 
-async function doRequest(path, base, key) {
+// Every network call goes through the throttle — including the 429 retry and
+// the /health preflight — so there is no path that bypasses pacing.
+function doRequest(path, base, key) {
+  return schedule(() => sendRequest(path, base, key));
+}
+
+async function sendRequest(path, base, key) {
   const url = buildRequestUrl(path, base);
   // Omit x-api-key entirely when the caller holds no key — e.g. the browser
   // artifact, whose same-origin backend/proxy injects the key server-side so it

@@ -79,7 +79,10 @@ describe('tool layer — behavior table (docs/Scenario-3-Lumenboard-Guide.md)', 
 
 describe('tool layer — pagination', () => {
   let server;
-  before(async () => { server = await startMockServer({ port: 3193, teamKey: 'pagination-test-key' }); });
+  // 3194, not 3193: lumenboardClient.test.mjs already claims 3193, and
+  // `node --test` runs the two files concurrently — sharing a port made
+  // whichever bound second fail with EADDRINUSE on ~1 run in 3.
+  before(async () => { server = await startMockServer({ port: 3194, teamKey: 'pagination-test-key' }); });
   after(async () => { await server.stop(); });
 
   function opts() {
