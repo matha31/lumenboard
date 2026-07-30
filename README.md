@@ -9,6 +9,10 @@ check-in, Wednesday 29 July.
   scoring, HTTP client, the four tools, and MCP server wiring in `src/`.
 - `frontend/artifact/` — the insight artifact (interactive at-risk-accounts view), its
   local `dev-proxy.mjs`, and design notes.
+- `frontend/snapshot/` — self-contained static export of the artifact (frozen synthetic
+  data inlined; opens straight in a browser, no server). Deliberately kept *outside*
+  `frontend/artifact/`: it embeds literal account ids, and `harness/lint.js` scans the
+  artifact and mcp-server trees for those — leaving it there VOIDs every harness score.
 - `dev/mock-server/` — local mock of the Lumenboard API used for build/test.
 - `harness/` — evaluation harness (scorer, lint, probe, status) and checksums.
 - `eval/` — dev/holdout account id lists.
@@ -22,6 +26,20 @@ check-in, Wednesday 29 July.
    the printed `/frontend/artifact/index.html` URL (the proxy injects the key server-side).
 3. MCP server: `npm start --prefix backend/mcp-server`.
 4. Tests: `npm test` (repo root).
+5. Presentation: `presentation/lumenboard-client-deck.html` — serve it over http
+   rather than opening the file directly, so the webfonts and
+   `presentation/assets/artifact.png` both load.
+
+### Request throttling
+
+Every call through `lumenboardClient` passes a client-side limiter (proposal §03):
+concurrency is bounded and request starts are paced, so a full risk digest — one
+`/accounts` read plus one `/usage` read per account — never arrives as a burst.
+Defaults are 4 concurrent and 25 ms between starts. Tune with
+`LUMENBOARD_MAX_CONCURRENCY` and `LUMENBOARD_MIN_INTERVAL_MS`, or call
+`configureThrottle({ maxConcurrency, minIntervalMs })` from the client module.
+The defaults are a sane guess against the local mock, not a measured fit to the
+real API's rate limit — revisit them once that API exists.
 
 ## Client quick reference
 

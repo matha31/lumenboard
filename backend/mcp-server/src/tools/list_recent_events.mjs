@@ -14,8 +14,11 @@ const DEFAULT_MAX_PAGES = 10000;
 export const description =
   'Returns recent product events (login, dashboard_view, report_export, invite_sent, seat_added, integration_connected), optionally filtered to one account and/or a since date, walking all result pages internally, plus a per-type count summary. Use to see what an account has actually been doing — including positive signals like seat_added — not just its risk score.';
 
+// Page size used for each upstream /events read. The API caps `limit` at 100.
+const PAGE_SIZE = 100;
+
 export async function listRecentEvents(input = {}) {
-  const { account_id, since, limit } = input;
+  const { account_id, since, limit, cursor } = input;
 
   if (account_id !== undefined && !isValidAccountId(account_id)) {
     return { ok: false, message: `account_id "${account_id}" is not a valid account id format (expected an acc_-prefixed id).` };
@@ -26,12 +29,26 @@ export async function listRecentEvents(input = {}) {
   if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) {
     return { ok: false, message: 'limit, if provided, must be a positive integer.' };
   }
+  if (cursor !== undefined && (typeof cursor !== 'string' || cursor.trim() === '')) {
+    return { ok: false, message: 'cursor, if provided, must be a non-empty string returned as next_cursor by a previous call.' };
+  }
+
+  // Two modes, both honouring the §03 promise that the caller never has to
+  // manage pagination to get a complete answer:
+  //   - no cursor (default): walk every page internally and return the lot.
+  //   - cursor given: resume from that point and return exactly one page plus
+  //     the next_cursor, so a caller who *wants* incremental control has it.
+  if (cursor !== undefined) {
+    return fetchSinglePage(input, cursor);
+  }
 
   const maxPages = Number.isInteger(input.maxPages) && input.maxPages > 0 ? input.maxPages : DEFAULT_MAX_PAGES;
   const all = [];
   const seenIds = new Set();
   const seenCursors = new Set();
-  let cursor;
+  // Distinct from the caller's `cursor` input (handled above) — this is the
+  // walk's own position as it advances through pages.
+  let walkCursor;
   let pages = 0;
   for (;;) {
     if (++pages > maxPages) {
@@ -39,8 +56,8 @@ export async function listRecentEvents(input = {}) {
     }
     const params = new URLSearchParams();
     if (since) params.set('since', since);
-    if (cursor) params.set('cursor', cursor);
-    params.set('limit', '100');
+    if (walkCursor) params.set('cursor', walkCursor);
+    params.set('limit', String(PAGE_SIZE));
     const res = await callLumenboard(`/events?${params.toString()}`, input);
     if (!res.ok) return mapApiError(res);
     const shape = validateEventsResponse(res.data);
@@ -56,7 +73,7 @@ export async function listRecentEvents(input = {}) {
       return { ok: false, message: 'Stopped reading events: the pagination cursor stopped advancing (repeated), aborting to avoid an infinite loop.' };
     }
     seenCursors.add(next);
-    cursor = next;
+    walkCursor = next;
   }
 
   let events = account_id ? all.filter((e) => e.account_id === account_id) : all;
@@ -70,5 +87,40 @@ export async function listRecentEvents(input = {}) {
   const event_counts = {};
   for (const ev of events) event_counts[ev.type] = (event_counts[ev.type] || 0) + 1;
 
-  return { ok: true, data: { events, event_counts } };
+  // next_cursor is always null here: the walk ran to exhaustion, so there is
+  // nothing left to resume from. It is present in both modes so the caller
+  // doesn't have to branch on shape.
+  return { ok: true, data: { events, event_counts, next_cursor: null } };
+}
+
+// Resume mode: one page from the caller's cursor, plus the cursor to continue
+// with. Same validation, sanitisation and shape-checking as the full walk —
+// the only difference is that we stop after a single read.
+async function fetchSinglePage(input, cursor) {
+  const { account_id, since, limit } = input;
+
+  const params = new URLSearchParams();
+  if (since) params.set('since', since);
+  params.set('cursor', cursor);
+  params.set('limit', String(PAGE_SIZE));
+
+  const res = await callLumenboard(`/events?${params.toString()}`, input);
+  if (!res.ok) return mapApiError(res);
+  const shape = validateEventsResponse(res.data);
+  if (!shape.ok) return shape;
+
+  let events = account_id
+    ? res.data.data.filter((e) => e.account_id === account_id)
+    : res.data.data.slice();
+  events.sort((a, b) => Date.parse(b.occurred_at) - Date.parse(a.occurred_at));
+  if (limit) events = events.slice(0, limit);
+  events = events.map((ev) => ({ ...ev, type: sanitizeApiText(ev.type, 64) }));
+
+  const event_counts = {};
+  for (const ev of events) event_counts[ev.type] = (event_counts[ev.type] || 0) + 1;
+
+  return {
+    ok: true,
+    data: { events, event_counts, next_cursor: res.data.next_cursor ?? null },
+  };
 }

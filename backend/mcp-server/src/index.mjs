@@ -52,7 +52,19 @@ server.registerTool(
   'list_accounts',
   {
     description: listAccountsDescription,
-    inputSchema: {},
+    inputSchema: {
+      page: z.number().int().min(1).optional().describe('1-based page number. Omit to return the whole roster in one response.'),
+      page_size: z.number().int().min(1).max(100).optional().describe('Accounts per page, maximum 100. Defaults to 25 when paging.'),
+      filters: z
+        .object({
+          plan: z.enum(['starter', 'pro', 'enterprise']).optional().describe('Only accounts on this plan.'),
+          name_contains: z.string().optional().describe('Case-insensitive substring match on the account name.'),
+          min_health: z.number().min(0).max(100).optional().describe('Only accounts with health_score at or above this.'),
+          max_health: z.number().min(0).max(100).optional().describe('Only accounts with health_score at or below this.'),
+        })
+        .optional()
+        .describe('Narrow the roster before paging. Filters apply to the full set, so total and has_next describe the filtered result.'),
+    },
   },
   async (input) => asToolResult(await listAccounts(input)),
 );
@@ -65,6 +77,11 @@ server.registerTool(
       account_id: z.string().min(1).optional().describe('Only return events for this account.'),
       since: z.string().optional().describe('ISO 8601 date-time; only return events at or after this time.'),
       limit: z.number().int().min(1).optional().describe('Maximum number of events to return, most recent first.'),
+      cursor: z
+        .string()
+        .min(1)
+        .optional()
+        .describe('Resume from a next_cursor returned by a previous call, returning a single page. Omit to walk every page internally and get the complete set in one response.'),
     },
   },
   async (input) => asToolResult(await listRecentEvents(input)),
