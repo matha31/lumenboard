@@ -9,7 +9,11 @@ Lumenboard is a hackathon client deliverable (Synthetic Signal Associate Program
 - **Backend MCP connector** (`backend/mcp-server/`) — four MCP tools that wrap the Lumenboard API and push risk scoring into the tool layer.
 - **Frontend insight artifact** (`frontend/artifact/`) — an interactive, self-contained HTML view of at-risk accounts.
 
-The real Lumenboard API (`https://api.lumenboard.syntheticsignal.io`) is **not deployed yet** (returns 404 with or without a valid key). Build and test against the local mock at `dev/mock-server/`, which implements the exact published OpenAPI shapes and is a drop-in stand-in. Pointing `LUMENBOARD_API_BASE` at the real URL later requires zero code changes.
+The real Lumenboard API **is live**, at `https://api.lumenboard.syntheticsignal.io/api` — note the **`/api` path prefix**. The bare origin 404s on every route including `/health`, which reads exactly like an undeployed service and is reinforced by the published `openapi.json`, whose own `servers` entry still says *"Production (once deployed, C-27 [HUMAN])"*. It is deployed; the spec is stale. Diagnostic rule: **404 on `/health` means the base URL is wrong; 401 means the key is.** `checkHealth()` says so, and suggests the `/api` suffix when the base has no path.
+
+Real data is smaller and differently shaped than the fixture: ~15 accounts / ~50 users with 3-digit ids (`acc_001`), against the mock's 42 accounts with 4-digit ids (`acc_0001`). Anything that assumes the fixture's scale or id width will look wrong on live data.
+
+`npm run demo` and both MCP transports read `.env` (via `src/env.mjs`) and default to the live API. **`npm test` and the harness never touch `.env`** — they pass explicit base/key options and run against `dev/mock-server/`, which implements the same published OpenAPI shapes. See `.env.example` for the config, including why the prefix matters.
 
 This repo is also structured as an **autonomous-optimization target**: `goal.md` drives an agent to build to `spec.md` (the inner loop, `npm test`) and then descend toward a held-out accuracy bar (the outer loop, `harness/score.sh`). Read `goal.md` and `spec.md` before any non-trivial change — they are the source of truth for intent and the file contracts the harness depends on.
 

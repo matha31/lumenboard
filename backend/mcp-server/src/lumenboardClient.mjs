@@ -208,5 +208,31 @@ export async function checkHealth(opts = {}) {
   }
   if (result.status >= 200 && result.status < 300) return { ok: true, status: result.status };
   if (result.status === 401) return { ok: false, status: 401, message: 'Lumenboard rejected the API key on /health — re-authenticate before using the tools.' };
+  // A 404 on /health is almost never "the API is down" — /health exists on every
+  // deployment. It means the base URL is wrong, and the overwhelmingly common
+  // cause is a missing /api path prefix. Saying so here turns an hour of
+  // "is it even deployed?" into a one-line fix. A wrong *key* returns 401, so a
+  // 404 genuinely does isolate the base URL as the problem.
+  if (result.status === 404) {
+    const hint = looksLikeMissingApiPrefix(base)
+      ? ` The base URL has no /api path segment — try ${String(base).replace(/\/+$/, '')}/api.`
+      : ' Check LUMENBOARD_API_BASE: /health exists on every deployment, so a 404 points at the base URL rather than the service. Note a wrong key would return 401, not 404.';
+    return { ok: false, status: 404, message: `Lumenboard /health returned 404 at ${base}.${hint}` };
+  }
   return { ok: false, status: result.status, message: `Lumenboard /health returned ${result.status}.` };
+}
+
+// True when the base is an absolute http(s) origin whose path is empty or "/".
+// Deliberately narrow: it must not fire for the artifact's relative "/api" base
+// or for a localhost mock, which are both correct as-is.
+function looksLikeMissingApiPrefix(base) {
+  const s = String(base || '');
+  if (!/^https?:\/\//i.test(s)) return false;
+  try {
+    const u = new URL(s);
+    if (/^localhost$|^127\./i.test(u.hostname)) return false;
+    return u.pathname === '' || u.pathname === '/';
+  } catch (_) {
+    return false;
+  }
 }

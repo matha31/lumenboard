@@ -12,3 +12,6 @@ harness/.probe_seed.json
 # Any local env file, whatever extension Notepad gives it — a real team key
 # lives here and must never reach a commit.
 .env*
+# …except the committed template. It carries no secret, and it documents the
+# base URL's /api path prefix — the thing that silently 404s if you miss it.
+!.env.example
