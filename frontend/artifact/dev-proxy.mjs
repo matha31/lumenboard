@@ -8,8 +8,10 @@
 //
 // Usage: node frontend/artifact/dev-proxy.mjs
 // Env:   DEV_PROXY_PORT (default 8090), UPSTREAM_API_BASE (default
-//        http://localhost:3001, i.e. the mock started separately).
+//        https://api.lumenboard.syntheticsignal.io/api — the live API; the mock
+//        at http://localhost:3001 is now test/harness-only).
 'use strict';
+import '../../backend/mcp-server/src/env.mjs'; // load .env (real API base + key)
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,7 +21,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // frontend/artifact/ -> repo root is two levels up.
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const PORT = Number(process.env.DEV_PROXY_PORT || 8090);
-const UPSTREAM = process.env.UPSTREAM_API_BASE || 'http://localhost:3001';
+// Real data by default. The mock (http://localhost:3001) is still usable by
+// setting UPSTREAM_API_BASE explicitly — e.g. for offline testing.
+const UPSTREAM = process.env.UPSTREAM_API_BASE || 'https://api.lumenboard.syntheticsignal.io/api';
 // The team API key lives here (server-side) only — set UPSTREAM_API_KEY (or
 // LUMENBOARD_API_KEY) when starting the proxy. It is injected onto every
 // upstream call and is NEVER sent to or read from the browser, so it stays out
@@ -35,7 +39,11 @@ const MIME = {
 };
 
 async function proxyApi(req, res, subPath) {
-  const upstreamUrl = new URL(subPath, UPSTREAM);
+  // String-concat (like the client's buildRequestUrl) so a base that carries a
+  // path prefix — the real API's /api — keeps it. new URL(subPath, base) drops
+  // the base's path when subPath is absolute, which silently stripped /api and
+  // 404'd against the live API.
+  const upstreamUrl = UPSTREAM.replace(/\/+$/, '') + subPath;
   // Inject the key server-side; deliberately ignore any x-api-key the browser
   // sends so a client-supplied credential can never override the scoped one.
   const headers = {};

@@ -18,6 +18,7 @@
 //                       otherwise the endpoint is open to anyone who finds it.
 //   LUMENBOARD_API_BASE / LUMENBOARD_API_KEY  as for the stdio server.
 'use strict';
+import './env.mjs'; // load .env (real API base + key) before anything reads the env
 import http from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';

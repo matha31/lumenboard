@@ -1,25 +1,44 @@
 #!/usr/bin/env node
-// dev/start-demo.mjs — one command to bring up everything the live demo needs:
-// the mock Lumenboard API and the artifact's dev-proxy (which injects the API
-// key server-side, so the browser never holds a credential).
+// dev/start-demo.mjs — one command to bring up the live artifact against the
+// REAL Lumenboard API. Real data is the default now: the mock is no longer
+// started at runtime (it remains the test/harness fixture only). The base URL
+// and team key come from .env (load-once via src/env.mjs), so no manual export
+// is needed.
 //
 //   npm run demo
 //
-// Then open the URL it prints. Ctrl-C stops both. Env overrides:
-//   DEMO_API_KEY   (default demo-key)  — key the mock expects and the proxy sends
-//   MOCK_PORT      (default 3001)
-//   DEV_PROXY_PORT (default 8090)
+// Then open the URL it prints. Ctrl-C stops the proxy. Env overrides (.env):
+//   LUMENBOARD_API_BASE   (default https://api.lumenboard.syntheticsignal.io/api)
+//   LUMENBOARD_API_KEY    (required — the team key)
+//   DEV_PROXY_PORT        (default 8090)
 'use strict';
+import '../backend/mcp-server/src/env.mjs'; // populate process.env from .env
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const KEY = process.env.DEMO_API_KEY || 'demo-key';
-const MOCK_PORT = process.env.MOCK_PORT || '3001';
+const API_BASE = process.env.LUMENBOARD_API_BASE || 'https://api.lumenboard.syntheticsignal.io/api';
+const API_KEY = process.env.LUMENBOARD_API_KEY;
 const PROXY_PORT = process.env.DEV_PROXY_PORT || '8090';
 
+if (!API_KEY) {
+  console.error(
+    '\n  LUMENBOARD_API_KEY is not set. Put the team key in .env (or export it) —\n  the artifact cannot reach the real API without it.\n',
+  );
+  process.exit(1);
+}
+
 const children = [];
+function shutdown(code) {
+  for (const c of children) if (!c.killed) c.kill();
+  process.exit(code ?? 0);
+}
+process.on('SIGINT', () => {
+  console.log('\nStopping…');
+  shutdown(0);
+});
+process.on('SIGTERM', () => shutdown(0));
 
 function start(label, relPath, env) {
   const child = spawn(process.execPath, [path.join(REPO_ROOT, relPath)], {
@@ -38,38 +57,20 @@ function start(label, relPath, env) {
     shutdown(code ?? 1);
   });
   children.push(child);
-  return child;
 }
 
-let shuttingDown = false;
-function shutdown(code) {
-  if (shuttingDown) return;
-  shuttingDown = true;
-  for (const c of children) {
-    if (!c.killed) c.kill();
-  }
-  process.exit(code);
-}
-process.on('SIGINT', () => {
-  console.log('\nStopping…');
-  shutdown(0);
+// Only the artifact dev-proxy is needed now — it proxies same-origin /api/* to
+// the live Lumenboard API with the key injected server-side. No mock is started.
+start('proxy', 'frontend/artifact/dev-proxy.mjs', {
+  DEV_PROXY_PORT: PROXY_PORT,
+  UPSTREAM_API_BASE: API_BASE,
+  UPSTREAM_API_KEY: API_KEY,
 });
-process.on('SIGTERM', () => shutdown(0));
 
-start('mock ', 'dev/mock-server/server.js', { MOCK_PORT, MOCK_TEAM_KEY: KEY });
-// Small stagger so the proxy's own startup log lands after the mock is up; the
-// proxy doesn't require the mock to be listening, this is purely cosmetic.
 setTimeout(() => {
-  start('proxy', 'frontend/artifact/dev-proxy.mjs', {
-    DEV_PROXY_PORT: PROXY_PORT,
-    UPSTREAM_API_BASE: `http://localhost:${MOCK_PORT}`,
-    UPSTREAM_API_KEY: KEY,
-  });
-  setTimeout(() => {
-    console.log('');
-    console.log('  Artifact:  ' + `http://localhost:${PROXY_PORT}/frontend/artifact/index.html`);
-    console.log('  Deck:      open presentation/lumenboard-client-deck.html directly in a browser');
-    console.log('');
-    console.log('  Ctrl-C to stop both servers.');
-  }, 600);
-}, 300);
+  console.log('');
+  console.log('  Artifact:  ' + `http://localhost:${PROXY_PORT}/frontend/artifact/index.html`);
+  console.log('  Upstream:  ' + API_BASE + '  (live Lumenboard API)');
+  console.log('');
+  console.log('  Ctrl-C to stop.');
+}, 500);

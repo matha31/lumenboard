@@ -3,6 +3,7 @@
 // Inspector, any local MCP client). Tool definitions live in ./server.mjs and
 // are shared with the Streamable HTTP transport in ./http.mjs, so the two can
 // never expose different tools.
+import './env.mjs'; // load .env (real API base + key) before anything reads the env
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { buildServer } from './server.mjs';
 import { checkHealth } from './lumenboardClient.mjs';
