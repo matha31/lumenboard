@@ -1511,7 +1511,7 @@
 
         <div class="slide-foot">
           <span class="label muted"></span>
-          <span class="label muted">03 / 14</span>
+          <span class="label muted">03 / 15</span>
         </div>
       </section>
 
@@ -1588,7 +1588,7 @@
 
         <div class="slide-foot">
           <span class="label" style="color: var(--c-fg-light-2)"></span>
-          <span class="label" style="color: var(--c-fg-light-2)">04 / 14</span>
+          <span class="label" style="color: var(--c-fg-light-2)">04 / 15</span>
         </div>
       </section>
 
@@ -1617,7 +1617,81 @@
         </p>
       </section>
 
-      <!-- ═══════ SLIDE 6 · SPLIT light — the artifact ══════════════════════ -->
+      <!-- ═══════ SLIDE 6 · DIAGRAM dark — end-to-end data path ═════════════
+           Dark rather than the template's light variant: .flow-title and
+           .flow-desc both carry .light overrides, so the layout works either
+           way, and staying dark keeps the light/dark alternation of the content
+           slides that follow intact.
+           ══════════════════════════════════════════════════════════════════ -->
+      <section class="slide dark slide--diagram">
+        <header class="slide-chrome">
+          <span class="label muted" data-anim="fade-in" data-delay="0"
+            >END TO END · WHAT RUNS WHERE</span
+          >
+          <span class="label muted" data-anim="fade-in" data-delay="0">06</span>
+        </header>
+
+        <div class="slide-body">
+          <h2 class="h2" data-anim="fade-up" data-delay="0">
+            From your API to a name worth <em>calling</em>
+          </h2>
+
+          <div class="flow" data-anim="fade-up" data-delay="1">
+            <div class="flow-step">
+              <div class="flow-num">01</div>
+              <div class="flow-title">Read</div>
+              <div class="flow-desc">
+                A live read of <strong>/accounts</strong>, then
+                <strong>/accounts/{id}/usage</strong> per account. The team key
+                is injected server-side, so it never reaches a browser.
+              </div>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="flow-num">02</div>
+              <div class="flow-title">Score</div>
+              <div class="flow-desc">
+                Health, usage trend and renewal proximity collapse into one
+                number and a bucket — computed identically every time, never
+                read from the clock.
+              </div>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="flow-num">03</div>
+              <div class="flow-title">Serve</div>
+              <div class="flow-desc">
+                Four purpose-built tools hand Claude a ranked list with a
+                plain-English reason per account — not a raw table to re-derive
+                risk from.
+              </div>
+            </div>
+
+            <div class="flow-arrow">→</div>
+
+            <div class="flow-step">
+              <div class="flow-num">04</div>
+              <div class="flow-title">Open</div>
+              <div class="flow-desc">
+                The Monday list, inside Claude, where your team already works.
+                One scoring path behind both the view and the tools, so they
+                cannot disagree.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-foot">
+          <span class="label muted">DATA PATH · JULY 2026</span>
+          <span class="label muted">06 / 15</span>
+        </footer>
+      </section>
+
+      <!-- ═══════ SLIDE 7 · SPLIT light — the artifact ══════════════════════ -->
       <section class="slide light slide--split">
         <div class="slide-chrome">
           <span
@@ -1632,7 +1706,7 @@
             style="color: var(--c-fg-light-2)"
             data-anim="fade-in"
             data-delay="0"
-            >06</span
+            >07</span
           >
         </div>
 
@@ -1649,7 +1723,8 @@
               <li>
                 <span
                   >Revenue at risk answered first —
-                  <strong>$175,733</strong> across urgent and watch</span
+                  <strong>$3,195</strong> across the accounts needing
+                  attention</span
                 >
               </li>
               <li><span>A plain-English reason per account, not just a score</span></li>
@@ -1689,24 +1764,24 @@
               />
             </div>
             <p class="img-caption" style="color: var(--c-fg-light-3)">
-              42 accounts scored · 11 urgent · $175,733 MRR at risk
+              Your 15 accounts · 3 urgent · $3,195 MRR at risk · 31 July
             </p>
           </div>
         </div>
 
         <div class="slide-foot">
           <span class="label" style="color: var(--c-fg-light-2)"></span>
-          <span class="label" style="color: var(--c-fg-light-2)">06 / 14</span>
+          <span class="label" style="color: var(--c-fg-light-2)">07 / 15</span>
         </div>
       </section>
 
-      <!-- ═══════ SLIDE 7 · DENSE dark — the formula ════════════════════════ -->
+      <!-- ═══════ SLIDE 8 · DENSE dark — the formula ════════════════════════ -->
       <section class="slide dark slide--dense">
         <div class="slide-chrome">
           <span class="label muted" data-anim="fade-in" data-delay="0"
             >HOW THE SCORE WORKS</span
           >
-          <span class="label muted" data-anim="fade-in" data-delay="0">07</span>
+          <span class="label muted" data-anim="fade-in" data-delay="0">08</span>
         </div>
 
         <h2 class="dense-hl" data-anim="fade-up" data-delay="1">
@@ -1755,11 +1830,11 @@
 
         <div class="slide-foot">
           <span class="label muted">RISK MODEL · JULY 2026</span>
-          <span class="label muted">07 / 14</span>
+          <span class="label muted">08 / 15</span>
         </div>
       </section>
 
-      <!-- ═══════ SLIDE 8 · LIST light — the four tools ═════════════════════ -->
+      <!-- ═══════ SLIDE 9 · LIST light — the four tools ═════════════════════ -->
       <section class="slide light slide--list">
         <div class="slide-chrome">
           <span
@@ -1774,7 +1849,7 @@
             style="color: var(--c-fg-light-2)"
             data-anim="fade-in"
             data-delay="0"
-            >08</span
+            >09</span
           >
         </div>
 
@@ -1825,17 +1900,17 @@
 
         <div class="slide-foot">
           <span class="label" style="color: var(--c-fg-light-2)"></span>
-          <span class="label" style="color: var(--c-fg-light-2)">08 / 14</span>
+          <span class="label" style="color: var(--c-fg-light-2)">09 / 15</span>
         </div>
       </section>
 
-      <!-- ═══════ SLIDE 9 · DENSE dark — reliability & security ══════════════ -->
+      <!-- ═══════ SLIDE 10 · DENSE dark — reliability & security ══════════════ -->
       <section class="slide dark slide--dense">
         <div class="slide-chrome">
           <span class="label muted" data-anim="fade-in" data-delay="0"
             >RELIABILITY &amp; SECURITY</span
           >
-          <span class="label muted" data-anim="fade-in" data-delay="0">09</span>
+          <span class="label muted" data-anim="fade-in" data-delay="0">10</span>
         </div>
 
         <h2 class="dense-hl" data-anim="fade-up" data-delay="1">
@@ -1877,11 +1952,11 @@
 
         <div class="slide-foot">
           <span class="label muted">SECURITY &amp; RELIABILITY · JULY 2026</span>
-          <span class="label muted">09 / 14</span>
+          <span class="label muted">10 / 15</span>
         </div>
       </section>
 
-      <!-- ═══════ SLIDE 10 · CHAPTER III dark ════════════════════════════════ -->
+      <!-- ═══════ SLIDE 11 · CHAPTER III dark ════════════════════════════════ -->
       <section class="slide dark slide--chapter">
         <div class="chapter-num" data-anim="fade-in" data-delay="0">
           03 · OUR WAY OF WORKING
@@ -1906,13 +1981,13 @@
         </p>
       </section>
 
-      <!-- ═══════ SLIDE 11 · CYCLE dark — the loop ══════════════════════════ -->
+      <!-- ═══════ SLIDE 12 · CYCLE dark — the loop ══════════════════════════ -->
       <section class="slide dark slide--cycle">
         <div class="slide-chrome">
           <span class="label muted" data-anim="fade-in" data-delay="0"
             >THE BUILD LOOP</span
           >
-          <span class="label muted" data-anim="fade-in" data-delay="0">11</span>
+          <span class="label muted" data-anim="fade-in" data-delay="0">12</span>
         </div>
 
         <div class="slide-body">
@@ -1975,17 +2050,17 @@
 
         <div class="slide-foot">
           <span class="label muted">CONTRACT-FIRST BUILD · JULY 2026</span>
-          <span class="label muted">11 / 14</span>
+          <span class="label muted">12 / 15</span>
         </div>
       </section>
 
-      <!-- ═══════ SLIDE 12 · STATS dark — scorecard ═════════════════════════ -->
+      <!-- ═══════ SLIDE 13 · STATS dark — scorecard ═════════════════════════ -->
       <section class="slide dark slide--stats">
         <div class="slide-chrome">
           <span class="label muted" data-anim="fade-in" data-delay="0"
             >WHERE IT STANDS</span
           >
-          <span class="label muted" data-anim="fade-in" data-delay="0">12</span>
+          <span class="label muted" data-anim="fade-in" data-delay="0">13</span>
         </div>
 
         <div class="slide-body">
@@ -2023,17 +2098,17 @@
 
         <div class="slide-foot">
           <span class="label muted"></span>
-          <span class="label muted">12 / 14</span>
+          <span class="label muted">13 / 15</span>
         </div>
       </section>
 
-      <!-- ═══════ SLIDE 13 · DENSE dark — open items ════════════════════════ -->
+      <!-- ═══════ SLIDE 14 · DENSE dark — open items ════════════════════════ -->
       <section class="slide dark slide--dense">
         <div class="slide-chrome">
           <span class="label muted" data-anim="fade-in" data-delay="0"
             >SHIPPED · AND ONE CAVEAT</span
           >
-          <span class="label muted" data-anim="fade-in" data-delay="0">13</span>
+          <span class="label muted" data-anim="fade-in" data-delay="0">14</span>
         </div>
 
         <h2 class="dense-hl" data-anim="fade-up" data-delay="1">
@@ -2085,11 +2160,11 @@
 
         <div class="slide-foot">
           <span class="label muted">HONEST STATUS · 31 JULY 2026</span>
-          <span class="label muted">13 / 14</span>
+          <span class="label muted">14 / 15</span>
         </div>
       </section>
 
-      <!-- ═══════ SLIDE 14 · END dark ═══════════════════════════════════════ -->
+      <!-- ═══════ SLIDE 15 · END dark ═══════════════════════════════════════ -->
       <section class="slide dark slide--end">
         <div class="kicker" data-anim="fade-in" data-delay="0">
           SYNTHETIC SIGNAL · NEGATIVE ZERO
